@@ -1,7 +1,6 @@
 import { useSession } from "next-auth/react";
-
-import { Button } from "antd";
 import Login from "./login";
+import Dashboard from "./dashbord";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -9,7 +8,7 @@ export default function Home() {
   if (status === "authenticated") {
     return (
       <div>
-        <Button type="primary">Button</Button>
+        <Dashboard />
       </div>
     );
   }

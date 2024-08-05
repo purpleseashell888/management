@@ -21,23 +21,7 @@ export default function Login() {
     });
 
     if (result.ok) {
-      // Fetch the session to get user roles
-      const response = await fetch("/api/auth/session");
-      const session = await response.json();
-
-      if (session.user && session.user.roles) {
-        const roles = session.user.roles;
-
-        if (roles.includes("admin")) {
-          router.push("/admin-dashboard"); // Admin-specific page
-        } else if (roles.includes("user")) {
-          router.push("/user-dashboard"); // User-specific page
-        } else {
-          router.push("/"); // Default page for other roles
-        }
-      } else {
-        router.push("/login"); // Redirect to the homepage if no roles found
-      }
+      router.push("/");
     } else {
       console.log(result);
     }
