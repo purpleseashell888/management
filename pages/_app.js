@@ -24,6 +24,7 @@ function getItem(label, key, icon, children) {
 }
 
 const routes = [
+  { path: "/", breadcrumbName: "首页" },
   { path: "/dashboard", breadcrumbName: "首页" },
   {
     path: "/sysmanage",
