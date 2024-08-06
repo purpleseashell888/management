@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 const { Header, Content, Footer, Sider } = Layout;
+const homePath = '/dashboard'
 
 function getItem(label, key, icon, children) {
   return {
@@ -60,11 +61,42 @@ const items = [
   getItem("关于项目", "/about", <FileOutlined />),
 ];
 
+const flatten = (arr = []) => {
+  return arr.flatMap((item) => {
+    if (item.children) {
+      return [item, ...flatten(item.children)];
+    }
+    return [item];
+  });
+}
+const findParent = (path, arr, res = []) => {
+  outer:for (const item of arr) {
+    if(item.children){
+      for (const subItem of item.children) {
+        if(subItem.path === path){
+          res.push(item)
+          break outer;
+        }
+        if(subItem.children){
+          const newRes = [...res];
+          newRes.push(item)
+          return findParent(path, subItem.children, newRes)
+        }
+      }
+    }
+  }
+  return res
+}
+const flattenRoutes = flatten(routes);
 export default function App({ Component, pageProps }) {
   const [collapsed, setCollapsed] = useState(false);
-
   const router = useRouter();
-
+  const defaultSelectedKeys = [router.route]
+  const defaultOpenKeys = findParent(router.route, routes).map(item=> item.path);
+  const [openKeys, setOpenKeys] = useState(defaultOpenKeys)
+  if(router.route === '/'){
+    router.replace(homePath)
+  }
   const onClick = (e) => {
     router.push(e.key);
   };
@@ -74,11 +106,15 @@ export default function App({ Component, pageProps }) {
   } = theme.useToken();
 
   const splicingData = (arr) => {
-    let items = []; // 存储拼接后的路径字符串数组
-    for (let i = 0; i < arr.length; i++) {
-      // 将当前数组的前i个元素拼接成一个路径，并加入到items数组中
-      items.push(arr.slice(0, i + 1).join("/"));
-    }
+    // let items = []; // 存储拼接后的路径字符串数组
+    // for (let i = 0; i < arr.length; i++) {
+    //   // 将当前数组的前i个元素拼接成一个路径，并加入到items数组中
+    //   items.push(arr.slice(0, i + 1).join("/"));
+    // }
+    const items = flattenRoutes.filter(item=> {
+      const name = item.path.split('/').pop()
+      return arr.includes(name)
+    })
     return items; // 返回结果数组
   };
 
@@ -88,10 +124,14 @@ export default function App({ Component, pageProps }) {
     obj[item.path] = item.breadcrumbName;
     return obj;
   }, {});
+  // 处理只允许展开一个menu
+  const handleOpenChange = (_openKeys) => {
+    setOpenKeys([_openKeys.pop()])
+  }
 
   return (
     <SessionProvider session={pageProps.session}>
-      <Layout
+      {router.route === '/login' ? <Component {...pageProps} /> : <Layout
         style={{
           minHeight: "100vh",
         }}
@@ -108,10 +148,13 @@ export default function App({ Component, pageProps }) {
           <div className="demo-logo-vertical" />
           <Menu
             theme="light"
-            defaultSelectedKeys={["/dashboard"]}
+            defaultSelectedKeys={defaultSelectedKeys}
+            // defaultOpenKeys={defaultOpenKeys}
+            openKeys={openKeys}
             mode="inline"
             items={items}
             onClick={onClick}
+            onOpenChange={handleOpenChange}
           />
         </Sider>
         <Layout>
@@ -132,7 +175,8 @@ export default function App({ Component, pageProps }) {
               }}
               items={splicingData(pathname.split("/")).map((item, index) => {
                 return {
-                  title: <Link href={item}>{breadcrumbNameMap[item]}</Link>,
+                  // title: <Link href={item}>{breadcrumbNameMap[item]}</Link>,
+                  title: <Link href={item.path}>{item.breadcrumbName}</Link>,
                 };
               })}
             ></Breadcrumb>
@@ -155,7 +199,7 @@ export default function App({ Component, pageProps }) {
             Ant Design ©{new Date().getFullYear()} Created by Ant UED
           </Footer>
         </Layout>
-      </Layout>
+      </Layout>}
     </SessionProvider>
   );
 }
