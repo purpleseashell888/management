@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 const { Header, Content, Footer, Sider } = Layout;
-const homePath = '/dashboard'
+// const homePath = "/dashboard";
 
 function getItem(label, key, icon, children) {
   return {
@@ -68,35 +68,53 @@ const flatten = (arr = []) => {
     }
     return [item];
   });
-}
+};
+
 const findParent = (path, arr, res = []) => {
-  outer:for (const item of arr) {
-    if(item.children){
+  // Start of the outer loop, which iterates over each item in the array
+  outer: for (const item of arr) {
+    // Check if the current item has children
+    if (item.children) {
+      // Start of the inner loop, which iterates over each child of the current item
       for (const subItem of item.children) {
-        if(subItem.path === path){
-          res.push(item)
+        // Check if the path of the current child matches the target path
+        if (subItem.path === path) {
+          // If a match is found, add the current item (parent) to the result array
+          res.push(item);
+          // Break out of both loops as we have found the parent
           break outer;
         }
-        if(subItem.children){
+        // If the current child has its own children, we need to search deeper
+        if (subItem.children) {
+          // Create a new result array that includes the current item
           const newRes = [...res];
-          newRes.push(item)
-          return findParent(path, subItem.children, newRes)
+          newRes.push(item);
+          // Recursively call findParent to search within the current child's children
+          return findParent(path, subItem.children, newRes);
         }
       }
     }
   }
-  return res
-}
+  // Return the result array, which will either be empty or contain the parent(s)
+  return res;
+};
+
 const flattenRoutes = flatten(routes);
+
 export default function App({ Component, pageProps }) {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
-  const defaultSelectedKeys = [router.route]
-  const defaultOpenKeys = findParent(router.route, routes).map(item=> item.path);
-  const [openKeys, setOpenKeys] = useState(defaultOpenKeys)
-  if(router.route === '/'){
-    router.replace(homePath)
-  }
+  const { pathname } = router;
+
+  const defaultSelectedKeys = [pathname];
+
+  const defaultOpenKeys = findParent(pathname, routes).map((item) => item.path);
+  const [openKeys, setOpenKeys] = useState(defaultOpenKeys);
+
+  // if (pathname === "/") {
+  //   router.replace(homePath);
+  // }
+
   const onClick = (e) => {
     router.push(e.key);
   };
@@ -111,95 +129,100 @@ export default function App({ Component, pageProps }) {
     //   // 将当前数组的前i个元素拼接成一个路径，并加入到items数组中
     //   items.push(arr.slice(0, i + 1).join("/"));
     // }
-    const items = flattenRoutes.filter(item=> {
-      const name = item.path.split('/').pop()
-      return arr.includes(name)
-    })
+    const items = flattenRoutes.filter((item) => {
+      const name = item.path.split("/").pop();
+      return arr.includes(name);
+    });
     return items; // 返回结果数组
   };
 
-  const { pathname } = router;
+  console.log(splicingData(pathname.split("/")));
 
-  const breadcrumbNameMap = routes.reduce((obj, item) => {
-    obj[item.path] = item.breadcrumbName;
-    return obj;
-  }, {});
+  // const breadcrumbNameMap = routes.reduce((obj, item) => {
+  //   obj[item.path] = item.breadcrumbName;
+  //   return obj;
+  // }, {});
+
   // 处理只允许展开一个menu
   const handleOpenChange = (_openKeys) => {
-    setOpenKeys([_openKeys.pop()])
-  }
+    setOpenKeys([_openKeys.pop()]);
+  };
 
   return (
     <SessionProvider session={pageProps.session}>
-      {router.route === '/login' ? <Component {...pageProps} /> : <Layout
-        style={{
-          minHeight: "100vh",
-        }}
-      >
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={(value) => setCollapsed(value)}
-          theme="light"
+      {router.route === "/login" ? (
+        <Component {...pageProps} />
+      ) : (
+        <Layout
+          style={{
+            minHeight: "100vh",
+          }}
         >
-          <div className="items-center flex justify-center h-[60px] ">
-            <span className="text-2xl">后台管理</span>
-          </div>
-          <div className="demo-logo-vertical" />
-          <Menu
+          <Sider
+            collapsible
+            collapsed={collapsed}
+            onCollapse={(value) => setCollapsed(value)}
             theme="light"
-            defaultSelectedKeys={defaultSelectedKeys}
-            // defaultOpenKeys={defaultOpenKeys}
-            openKeys={openKeys}
-            mode="inline"
-            items={items}
-            onClick={onClick}
-            onOpenChange={handleOpenChange}
-          />
-        </Sider>
-        <Layout>
-          <Header
-            style={{
-              padding: 0,
-              background: colorBgContainer,
-            }}
-          />
-          <Content
-            style={{
-              margin: "0 16px",
-            }}
           >
-            <Breadcrumb
+            <div className="items-center flex justify-center h-[60px] ">
+              <span className="text-2xl">后台管理</span>
+            </div>
+            <div className="demo-logo-vertical" />
+            <Menu
+              theme="light"
+              defaultSelectedKeys={defaultSelectedKeys}
+              // defaultOpenKeys={defaultOpenKeys}
+              openKeys={openKeys}
+              mode="inline"
+              items={items}
+              onClick={onClick}
+              onOpenChange={handleOpenChange}
+            />
+          </Sider>
+          <Layout>
+            <Header
               style={{
-                margin: "16px 0",
-              }}
-              items={splicingData(pathname.split("/")).map((item, index) => {
-                return {
-                  // title: <Link href={item}>{breadcrumbNameMap[item]}</Link>,
-                  title: <Link href={item.path}>{item.breadcrumbName}</Link>,
-                };
-              })}
-            ></Breadcrumb>
-            <div
-              style={{
-                padding: 24,
-                minHeight: 360,
+                padding: 0,
                 background: colorBgContainer,
-                borderRadius: borderRadiusLG,
+              }}
+            />
+            <Content
+              style={{
+                margin: "0 16px",
               }}
             >
-              <Component {...pageProps} />
-            </div>
-          </Content>
-          <Footer
-            style={{
-              textAlign: "center",
-            }}
-          >
-            Ant Design ©{new Date().getFullYear()} Created by Ant UED
-          </Footer>
+              <Breadcrumb
+                style={{
+                  margin: "16px 0",
+                }}
+                items={splicingData(pathname.split("/")).map((item, index) => {
+                  return {
+                    // title: <Link href={item}>{breadcrumbNameMap[item]}</Link>,
+                    title: <Link href={item.path}>{item.breadcrumbName}</Link>,
+                  };
+                })}
+              ></Breadcrumb>
+              <div
+                style={{
+                  padding: 24,
+                  minHeight: 360,
+                  background: colorBgContainer,
+                  borderRadius: borderRadiusLG,
+                }}
+              >
+                <Component {...pageProps} />
+              </div>
+            </Content>
+            <Footer
+              style={{
+                textAlign: "center",
+              }}
+            >
+              Ant Design ©{new Date().getFullYear()} Created by Ant UED
+            </Footer>
+          </Layout>
         </Layout>
-      </Layout>}
+      )}
     </SessionProvider>
   );
 }
