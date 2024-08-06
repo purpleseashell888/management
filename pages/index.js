@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import Login from "./login";
-import Dashboard from "./dashbord";
+import Dashboard from "./dashboard";
 
 export default function Home() {
   const { data: session, status } = useSession();
