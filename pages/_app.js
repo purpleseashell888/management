@@ -1,4 +1,4 @@
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 import "@/styles/globals.css";
 
 import React, { useState } from "react";
@@ -11,6 +11,7 @@ import {
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Auth from "@/component/Auth";
 
 const { Header, Content, Footer, Sider } = Layout;
 // const homePath = "/dashboard";
@@ -158,7 +159,7 @@ export default function App({
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
   const { pathname } = router;
-  const { data: sessionData } = useSession();
+  // const { data: sessionData } = useSession();
 
   const defaultSelectedKeys = [pathname];
 
@@ -217,85 +218,87 @@ export default function App({
     return session?.user.roles && item.roles.includes(session.user.roles);
   });
 
-  console.log(sessionData.user.roles);
+  // console.log(sessionData.user.roles);
 
   console.log(filteredItems);
 
   return (
     <SessionProvider session={session}>
-      {pathname === "/login" ? (
-        <Component {...pageProps} />
-      ) : (
-        <Layout
-          style={{
-            minHeight: "100vh",
-          }}
-        >
-          <Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
-            theme="light"
+      <Auth>
+        {pathname === "/login" ? (
+          <Component {...pageProps} />
+        ) : (
+          <Layout
+            style={{
+              minHeight: "100vh",
+            }}
           >
-            <div className="items-center flex justify-center h-[60px] ">
-              <span className="text-2xl">后台管理</span>
-            </div>
-            <div className="demo-logo-vertical" />
-            <Menu
+            <Sider
+              collapsible
+              collapsed={collapsed}
+              onCollapse={(value) => setCollapsed(value)}
               theme="light"
-              defaultSelectedKeys={defaultSelectedKeys}
-              // defaultOpenKeys={defaultOpenKeys}
-              openKeys={openKeys}
-              mode="inline"
-              items={filteredItems}
-              onClick={onClick}
-              onOpenChange={handleOpenChange}
-            />
-          </Sider>
-          <Layout>
-            <Header
-              style={{
-                padding: 0,
-                background: colorBgContainer,
-              }}
-            />
-            <Content
-              style={{
-                margin: "0 16px",
-              }}
             >
-              <Breadcrumb
+              <div className="items-center flex justify-center h-[60px] ">
+                <span className="text-2xl">后台管理</span>
+              </div>
+              <div className="demo-logo-vertical" />
+              <Menu
+                theme="light"
+                defaultSelectedKeys={defaultSelectedKeys}
+                // defaultOpenKeys={defaultOpenKeys}
+                openKeys={openKeys}
+                mode="inline"
+                items={filteredItems}
+                onClick={onClick}
+                onOpenChange={handleOpenChange}
+              />
+            </Sider>
+            <Layout>
+              <Header
                 style={{
-                  margin: "16px 0",
-                }}
-                items={splicingData(pathname.split("/")).map((item, index) => {
-                  return {
-                    // title: <Link href={item}>{breadcrumbNameMap[item]}</Link>,
-                    title: <Link href={item.path}>{item.breadcrumbName}</Link>,
-                  };
-                })}
-              ></Breadcrumb>
-              <div
-                style={{
-                  padding: 24,
-                  minHeight: 360,
+                  padding: 0,
                   background: colorBgContainer,
-                  borderRadius: borderRadiusLG,
+                }}
+              />
+              <Content
+                style={{
+                  margin: "0 16px",
                 }}
               >
-                <Component {...pageProps} />
-              </div>
-            </Content>
-            <Footer
-              style={{
-                textAlign: "center",
-              }}
-            >
-              Ant Design ©{new Date().getFullYear()} Created by Ant UED
-            </Footer>
+                <Breadcrumb
+                  style={{
+                    margin: "16px 0",
+                  }}
+                  items={splicingData(pathname.split("/")).map((item, index) => {
+                    return {
+                      // title: <Link href={item}>{breadcrumbNameMap[item]}</Link>,
+                      title: <Link href={item.path}>{item.breadcrumbName}</Link>,
+                    };
+                  })}
+                ></Breadcrumb>
+                <div
+                  style={{
+                    padding: 24,
+                    minHeight: 360,
+                    background: colorBgContainer,
+                    borderRadius: borderRadiusLG,
+                  }}
+                >
+                  <Component {...pageProps} />
+                </div>
+              </Content>
+              <Footer
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                Ant Design ©{new Date().getFullYear()} Created by Ant UED
+              </Footer>
+            </Layout>
           </Layout>
-        </Layout>
-      )}
+        )}
+      </Auth>
     </SessionProvider>
   );
 }
