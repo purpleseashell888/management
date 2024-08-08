@@ -3,7 +3,7 @@ import Login from "./login";
 import Dashboard from "./dashboard";
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   if (status === "authenticated") {
     return (

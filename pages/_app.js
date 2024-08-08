@@ -1,4 +1,4 @@
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import "@/styles/globals.css";
 
 import React, { useState } from "react";
@@ -25,26 +25,36 @@ function getItem(label, key, icon, children) {
 }
 
 const routes = [
-  { path: "/", breadcrumbName: "首页" },
-  { path: "/dashboard", breadcrumbName: "首页" },
+  { path: "/", breadcrumbName: "首页", roles: ["admin", "user"] },
+  { path: "/dashboard", breadcrumbName: "首页", roles: ["admin", "user"] },
   {
     path: "/sysmanage",
     breadcrumbName: "系统管理",
+    roles: ["admin"],
     children: [
-      { path: "/sysmanage/roles", breadcrumbName: "角色管理" },
-      { path: "/sysmanage/menu", breadcrumbName: "菜单管理" },
-      { path: "/sysmanage/apimanage", breadcrumbName: "api管理" },
+      {
+        path: "/sysmanage/roles",
+        breadcrumbName: "角色管理",
+        roles: ["admin"],
+      },
+      { path: "/sysmanage/menu", breadcrumbName: "菜单管理", roles: ["admin"] },
+      {
+        path: "/sysmanage/apimanage",
+        breadcrumbName: "api管理",
+        roles: ["admin"],
+      },
     ],
   },
   {
     path: "/systools",
     breadcrumbName: "系统工具",
+    roles: ["admin"],
     children: [
-      { path: "/systools/mode", breadcrumbName: "模版配置" },
-      { path: "/systools/table", breadcrumbName: "表格模版" },
+      { path: "/systools/mode", breadcrumbName: "模版配置", roles: ["admin"] },
+      { path: "/systools/table", breadcrumbName: "表格模版", roles: ["admin"] },
     ],
   },
-  { path: "/about", breadcrumbName: "关于项目" },
+  { path: "/about", breadcrumbName: "关于项目", roles: ["admin", "user"] },
 ];
 
 const items = [
@@ -61,6 +71,32 @@ const items = [
   getItem("关于项目", "/about", <FileOutlined />),
 ];
 
+// const items2 = [
+//   getItem("首页", "/dashboard", <PieChartOutlined />, ["admin", "user"]),
+//   getItem(
+//     "系统管理",
+//     "/sysmanage",
+//     <UserOutlined />,
+//     ["admin"],
+//     [
+//       getItem("角色管理", "/sysmanage/roles", ["admin"]),
+//       getItem("菜单管理", "/sysmanage/menu", ["admin"]),
+//       getItem("API管理", "/sysmanage/apimanage", ["admin"]),
+//     ]
+//   ),
+//   getItem(
+//     "系统工具",
+//     "/systools",
+//     <TeamOutlined />,
+//     ["admin"],
+//     [
+//       getItem("模版配置", "/systools/mode", ["admin"]),
+//       getItem("表格模版", "/systools/table", ["admin"]),
+//     ]
+//   ),
+//   getItem("关于项目", "/about", <FileOutlined />, ["admin", "user"]),
+// ];
+
 const flatten = (arr = []) => {
   return arr.flatMap((item) => {
     if (item.children) {
@@ -69,6 +105,8 @@ const flatten = (arr = []) => {
     return [item];
   });
 };
+
+const flattenRoutes = flatten(routes);
 
 const findParent = (path, arr, res = []) => {
   // Start of the outer loop, which iterates over each item in the array
@@ -99,12 +137,28 @@ const findParent = (path, arr, res = []) => {
   return res;
 };
 
-const flattenRoutes = flatten(routes);
+// const filterItemsByRole = (items, roles) => {
+//   return items.reduce((filtered, item) => {
+//     if (item.children) {
+//       const filteredChildren = filterItemsByRole(item.children, roles);
+//       if (filteredChildren.length > 0) {
+//         filtered.push({ ...item, children: filteredChildren });
+//       }
+//     } else if (roles.some((role) => item.roles.includes(role))) {
+//       filtered.push(item);
+//     }
+//     return filtered;
+//   }, []);
+// };
 
-export default function App({ Component, pageProps }) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
   const { pathname } = router;
+  const { data: sessionData } = useSession();
 
   const defaultSelectedKeys = [pathname];
 
@@ -136,7 +190,7 @@ export default function App({ Component, pageProps }) {
     return items; // 返回结果数组
   };
 
-  console.log(splicingData(pathname.split("/")));
+  // console.log(splicingData(pathname.split("/")));
 
   // const breadcrumbNameMap = routes.reduce((obj, item) => {
   //   obj[item.path] = item.breadcrumbName;
@@ -148,9 +202,28 @@ export default function App({ Component, pageProps }) {
     setOpenKeys([_openKeys.pop()]);
   };
 
+  const filteredItems = routes.filter((item) => {
+    if (item.children) {
+      item.children = item.children.filter(
+        (subItem) =>
+          session?.user.roles && subItem.roles.includes(session.user.roles)
+      );
+      return (
+        item.children.length > 0 &&
+        session?.user.roles &&
+        item.roles.includes(session.user.roles)
+      );
+    }
+    return session?.user.roles && item.roles.includes(session.user.roles);
+  });
+
+  console.log(sessionData.user.roles);
+
+  console.log(filteredItems);
+
   return (
-    <SessionProvider session={pageProps.session}>
-      {router.route === "/login" ? (
+    <SessionProvider session={session}>
+      {pathname === "/login" ? (
         <Component {...pageProps} />
       ) : (
         <Layout
@@ -174,7 +247,7 @@ export default function App({ Component, pageProps }) {
               // defaultOpenKeys={defaultOpenKeys}
               openKeys={openKeys}
               mode="inline"
-              items={items}
+              items={filteredItems}
               onClick={onClick}
               onOpenChange={handleOpenChange}
             />
