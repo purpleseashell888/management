@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import Login from "./login";
-import Dashboard from "./dashboard";
+import Welcome from "./welcome";
 
 export default function Home() {
   const { status } = useSession();
@@ -8,7 +8,7 @@ export default function Home() {
   if (status === "authenticated") {
     return (
       <div>
-        <Dashboard />
+        <Welcome />
       </div>
     );
   }
