@@ -1,25 +1,11 @@
 import React, { useState } from "react";
-import {
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 
 const { Header, Content, Footer, Sider } = Layout;
-
-function getItem(label, key, icon, children) {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  };
-}
 
 const routes = [
   { key: "/", label: "首页", roles: ["admin", "user"] },
@@ -52,53 +38,6 @@ const routes = [
     ],
   },
   { key: "/about", label: "关于项目", roles: ["admin", "user"] },
-];
-
-// const routes = [
-//   { path: "/", breadcrumbname: "首页", roles: ["admin", "user"] },
-//   { path: "/welcome", breadcrumbname: "首页", roles: ["admin", "user"] },
-//   {
-//     path: "/sysmanage",
-//     breadcrumbname: "系统管理",
-//     roles: ["admin"],
-//     children: [
-//       {
-//         path: "/sysmanage/roles",
-//         breadcrumbname: "角色管理",
-//         roles: ["admin"],
-//       },
-//       { path: "/sysmanage/menu", breadcrumbname: "菜单管理", roles: ["admin"] },
-//       {
-//         path: "/sysmanage/apimanage",
-//         breadcrumbname: "api管理",
-//         roles: ["admin"],
-//       },
-//     ],
-//   },
-//   {
-//     path: "/systools",
-//     breadcrumbname: "系统工具",
-//     roles: ["admin"],
-//     children: [
-//       { path: "/systools/mode", breadcrumbname: "模版配置", roles: ["admin"] },
-//       { path: "/systools/table", breadcrumbname: "表格模版", roles: ["admin"] },
-//     ],
-//   },
-//   { path: "/about", breadcrumbname: "关于项目", roles: ["admin", "user"] },
-// ];
-
-const items = [
-  getItem("首页", "/welcome", <PieChartOutlined />),
-  getItem("系统管理", "/sysmanage", <UserOutlined />, [
-    getItem("角色管理", "/sysmanage/roles"),
-    getItem("菜单管理", "/sysmanage/menu"),
-    getItem("API管理", "/sysmanage/apimanage"),
-  ]),
-  getItem("系统工具", "/systools", <TeamOutlined />, [
-    getItem("模版配置", "/systools/mode"),
-    getItem("表格模版", "/systools/table"),
-  ]),
-  getItem("关于项目", "/about", <FileOutlined />),
 ];
 
 const flatten = (arr = []) => {
@@ -176,20 +115,6 @@ export default function Dashboard({ children }) {
     setOpenKeys([_openKeys.pop()]);
   };
 
-  //   const filteredItems = routes.filter((item) => {
-  //     if (item.children) {
-  //       item.children = item.children.filter(
-  //         (subItem) =>
-  //           session?.user.roles && subItem.roles.includes(session?.user.roles)
-  //       );
-  //       return (
-  //         // item.children.length > 0 &&
-  //         session?.user.roles && item.roles.includes(session?.user.roles)
-  //       );
-  //     }
-  //     return session?.user.roles && item.roles.includes(session?.user.roles);
-  //   });
-
   const filteredItems = routes.map((item) => {
     let newItem = { ...item }; // Create a copy of the item to avoid mutating the original
 
@@ -214,14 +139,8 @@ export default function Dashboard({ children }) {
     return null; // Filter out items that don't match
   });
 
-  console.log(session?.user.roles);
-
-  console.log(filteredItems);
-
-  console.log(items);
-
   return (
-    <div>
+    <div className="overflow-hidden">
       {" "}
       {pathname === "/login" ? (
         children
@@ -237,7 +156,7 @@ export default function Dashboard({ children }) {
             onCollapse={(value) => setCollapsed(value)}
             theme="light"
           >
-            <div className="items-center flex justify-center h-[60px] ">
+            <div className="flex items-center justify-center h-[60px] ">
               <span className="text-2xl">后台管理</span>
             </div>
             <div className="demo-logo-vertical" />
