@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectToDatabase } from "@/lib/db";
 
 export const authOptions = {
   session: {
@@ -18,26 +17,62 @@ export const authOptions = {
         // that is false/null if the credentials are invalid.
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
 
-        const client = await connectToDatabase();
+        // const client = await connectToDatabase();
 
-        const usersCollection = client.db().collection("users");
+        // const usersCollection = client.db().collection("users");
 
         // Add logic here to look up the user from the credentials supplied
-        const user = await usersCollection.findOne({
-          name: credentials.name,
-        });
+        // const user = await usersCollection.findOne({
+        //   name: credentials.name,
+        // });
 
-        if (!user) {
-          client.close();
-          throw new Error("No user found!");
+        try {
+          const response = await fetch("http://api.jsonlee.cn/api/base/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: credentials.name,
+              password: credentials.password,
+            }),
+          });
+
+          const contentType = response.headers.get("content-type");
+          console.log(contentType);
+
+          const responseText = await response.text();
+          console.log("Response Text:", responseText);
+
+          // Parse the response
+          const data = await response.json();
+
+          // Check if the login was successful
+          if (response.ok && data.success) {
+            const user = data.user;
+
+            // Return user object which contains name and roles
+            return { name: user.username, roles: user.username };
+          } else {
+            // If login fails, throw an error
+            throw new Error(data.message || "Login failed");
+          }
+        } catch (error) {
+          // Handle errors (e.g., network errors, incorrect credentials)
+          throw new Error(error.message || "An error occurred during login");
         }
 
-        if (credentials.password !== user.password) {
-          throw new Error("Could not log you in!");
-        }
-        client.close();
+        // if (!user) {
+        //   client.close();
+        //   throw new Error("No user found!");
+        // }
 
-        return { name: user.name, roles: user.roles };
+        // if (credentials.password !== user.password) {
+        //   throw new Error("Could not log you in!");
+        // }
+        // client.close();
+
+        // return { name: user.name, roles: user.roles };
       },
     }),
   ],

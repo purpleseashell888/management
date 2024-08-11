@@ -15,4 +15,5 @@ module.exports = {
     },
   },
   plugins: [],
+  safelist: ["text-2xl", "h-[60px]"],
 };
