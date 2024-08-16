@@ -33,6 +33,8 @@ export const authOptions = {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
+              captcha: credentials.captcha,
+              captchaId: credentials.captchaId,
               username: credentials.name,
               password: credentials.password,
             }),

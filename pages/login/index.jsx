@@ -1,23 +1,39 @@
 import { useRouter } from "next/router";
 
 import { signIn } from "next-auth/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import Image from "next/image";
+import createCaptcha from "@/lib/captcha";
 
 export default function Login() {
   const router = useRouter();
   const nameInputRef = useRef();
   const passwordInputRef = useRef();
+  const captchaInputRef = useRef();
+
+  const { captcha, setCaptcha } = useState(createCaptcha());
+
+  console.log(captcha);
+
+  // console.log(captcha.dataUrl);
+
+  const handleRefresh = () => {
+    setCaptcha(createCaptcha()); // 刷新验证码
+  };
 
   async function submitHandler(event) {
     event.preventDefault();
 
     const enteredName = nameInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
+    const enteredCaptcha = captchaInputRef.current.value;
 
     const result = await signIn("credentials", {
       redirect: false,
       name: enteredName,
       password: enteredPassword,
+      captcha: enteredCaptcha,
+      captchaId: captcha.captchaId,
     });
 
     if (result.ok) {
@@ -57,6 +73,20 @@ export default function Login() {
               placeholder="123456"
               required
               ref={passwordInputRef}
+            />
+          </div>
+          <div>
+            <Image
+              // src={captcha.dataUrl}
+              width={200}
+              height={30}
+              alt="captcha"
+            />
+            <button onClick={handleRefresh}>刷新</button>
+            <input
+              className="w-full border-2 border-gray-100 rounded-xl p-4 mt-3 bg-transparent"
+              required
+              ref={captchaInputRef}
             />
           </div>
           <div className="mt-8 flex flex-col">
