@@ -27,7 +27,7 @@ export const authOptions = {
         // });
 
         try {
-          const response = await fetch("http://api.jsonlee.cn/api/base/login", {
+          const response = await fetch("http://api.jsonlee.cn/base/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -38,11 +38,11 @@ export const authOptions = {
             }),
           });
 
-          const contentType = response.headers.get("content-type");
-          console.log(contentType);
+          // const contentType = response.headers.get("content-type");
+          // console.log(contentType);
 
-          const responseText = await response.text();
-          console.log("Response Text:", responseText);
+          // const responseText = await response.text();
+          // console.log("Response Text:", responseText);
 
           // Parse the response
           const data = await response.json();
