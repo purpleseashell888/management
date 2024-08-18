@@ -27,7 +27,7 @@ export const authOptions = {
         // });
 
         try {
-          const response = await fetch("http://api.jsonlee.cn/base/login", {
+          const response = await fetch("/base/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
