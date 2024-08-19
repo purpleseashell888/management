@@ -27,7 +27,11 @@ export const authOptions = {
         // });
 
         try {
-          const response = await fetch("/api/base/login", {
+          const baseURL =
+            process.env.NODE_ENV === "development"
+              ? "/proxy"
+              : "https://api.jsonlee.cn";
+          const response = await fetch(baseURL + "/base/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -35,10 +39,12 @@ export const authOptions = {
             body: JSON.stringify({
               captcha: credentials.captcha,
               captchaId: credentials.captchaId,
-              username: credentials.name,
               password: credentials.password,
+              username: credentials.name,
             }),
           });
+
+          console.log(response);
 
           // const contentType = response.headers.get("content-type");
           // console.log(contentType);
@@ -54,7 +60,7 @@ export const authOptions = {
             const user = data.user;
 
             // Return user object which contains name and roles
-            return { name: user.username, roles: user.username };
+            return { name: user.userName, roles: user.userName };
           } else {
             // If login fails, throw an error
             throw new Error(data.message || "Login failed");

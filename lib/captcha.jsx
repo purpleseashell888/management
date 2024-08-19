@@ -4,7 +4,7 @@ export default async function createCaptcha() {
 
     const baseURL =
       process.env.NODE_ENV === "development"
-        ? "/api"
+        ? "/proxy"
         : "https://api.jsonlee.cn";
     const response = await fetch(baseURL + "/base/captcha", {
       method: "POST",

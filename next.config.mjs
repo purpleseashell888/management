@@ -16,7 +16,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
+        source: "/proxy/:path*",
         destination: "http://api.jsonlee.cn/:path*",
       },
     ];

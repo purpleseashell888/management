@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
 import { signIn } from "next-auth/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import createCaptcha from "@/lib/captcha";
 
@@ -11,17 +11,26 @@ export default function Login() {
   const passwordInputRef = useRef();
   const captchaInputRef = useRef();
 
-  const { captcha, setCaptcha } = useState(createCaptcha());
+  const [captcha, setCaptcha] = useState("");
 
-  // console.log(createCaptcha());
-
-  console.log(captcha);
+  // console.log(captcha);
 
   // console.log(captcha.dataUrl);
 
-  const handleRefresh = () => {
-    setCaptcha(createCaptcha()); // 刷新验证码
+  const handleRefresh = async () => {
+    try {
+      const { dataUrl } = await createCaptcha();
+      setCaptcha(dataUrl);
+      // console.debug(res);
+    } catch (error) {
+      console.log(error);
+    }
+    // setCaptcha(createCaptcha()); // 刷新验证码
   };
+
+  useEffect(() => {
+    handleRefresh();
+  }, []);
 
   async function submitHandler(event) {
     event.preventDefault();
@@ -29,15 +38,19 @@ export default function Login() {
     const enteredName = nameInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     const enteredCaptcha = captchaInputRef.current.value;
+    const { captchaId } = await createCaptcha();
+
+    // console.log(enteredName, enteredPassword, enteredCaptcha, captchaId);
 
     const result = await signIn("credentials", {
       redirect: false,
-      name: enteredName,
-      password: enteredPassword,
       captcha: enteredCaptcha,
-      captchaId: captcha.captchaId,
+      captchaId: captchaId,
+      password: enteredPassword,
+      name: enteredName,
     });
 
+    // console.log(result);
     if (result.ok) {
       router.push("/");
     } else {
@@ -78,12 +91,7 @@ export default function Login() {
             />
           </div>
           <div>
-            <Image
-              // src={captcha.dataUrl}
-              width={200}
-              height={30}
-              alt="captcha"
-            />
+            <Image src={captcha} width={200} height={30} alt="captcha" />
             <button onClick={handleRefresh}>刷新</button>
             <input
               className="w-full border-2 border-gray-100 rounded-xl p-4 mt-3 bg-transparent"
