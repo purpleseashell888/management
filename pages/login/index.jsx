@@ -1,9 +1,9 @@
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
-import { signIn } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import createCaptcha from "@/lib/captcha";
+import { signIn } from 'next-auth/react';
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import createCaptcha from '@/lib/captcha';
 
 export default function Login() {
   const router = useRouter();
@@ -11,7 +11,8 @@ export default function Login() {
   const passwordInputRef = useRef();
   const captchaInputRef = useRef();
 
-  const [captcha, setCaptcha] = useState("");
+  const [captcha, setCaptcha] = useState('');
+  const [captchaId, setCaptchaId] = useState('');
 
   // console.log(captcha);
 
@@ -19,8 +20,9 @@ export default function Login() {
 
   const handleRefresh = async () => {
     try {
-      const { dataUrl } = await createCaptcha();
+      const { dataUrl, captchaId } = await createCaptcha();
       setCaptcha(dataUrl);
+      setCaptchaId(captchaId)
       // console.debug(res);
     } catch (error) {
       console.log(error);
@@ -38,7 +40,7 @@ export default function Login() {
     const enteredName = nameInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     const enteredCaptcha = captchaInputRef.current.value;
-    const { captchaId } = await createCaptcha();
+    // const { captchaId } = await createCaptcha();
 
     // console.log(enteredName, enteredPassword, enteredCaptcha, captchaId);
 
@@ -49,10 +51,8 @@ export default function Login() {
       password: enteredPassword,
       name: enteredName,
     });
-
-    // console.log(result);
     if (result.ok) {
-      router.push("/");
+      router.push('/');
     } else {
       console.log(result);
     }
@@ -100,10 +100,7 @@ export default function Login() {
             />
           </div>
           <div className="mt-8 flex flex-col">
-            <button
-              className="py-3 rounded-xl bg-violet-500 text-white text-lg font-bold"
-              type="submit"
-            >
+            <button className="py-3 rounded-xl bg-violet-500 text-white text-lg font-bold" type="submit">
               登录
             </button>
           </div>

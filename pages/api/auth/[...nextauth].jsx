@@ -25,12 +25,12 @@ export const authOptions = {
         // const user = await usersCollection.findOne({
         //   name: credentials.name,
         // });
-
+        console.log(credentials, ">>>")
         try {
           const baseURL =
             process.env.NODE_ENV === "development"
-              ? "/proxy"
-              : "https://api.jsonlee.cn";
+              ? "http://localhost:3000/proxy"
+              : "http://api.jsonlee.cn";
           const response = await fetch(baseURL + "/base/login", {
             method: "POST",
             headers: {
@@ -44,7 +44,7 @@ export const authOptions = {
             }),
           });
 
-          console.log(response);
+          // console.log(response);
 
           // const contentType = response.headers.get("content-type");
           // console.log(contentType);
@@ -53,8 +53,11 @@ export const authOptions = {
           // console.log("Response Text:", responseText);
 
           // Parse the response
+          /**
+           * 应该先判断ok再进行json处理
+           */
           const data = await response.json();
-
+          console.log(data);
           // Check if the login was successful
           if (response.ok && data.success) {
             const user = data.user;
@@ -66,6 +69,7 @@ export const authOptions = {
             throw new Error(data.message || "Login failed");
           }
         } catch (error) {
+          console.log(error);
           // Handle errors (e.g., network errors, incorrect credentials)
           throw new Error(error.message || "An error occurred during login");
         }
