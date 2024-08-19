@@ -27,7 +27,7 @@ export const authOptions = {
         // });
 
         try {
-          const response = await fetch("/base/login", {
+          const response = await fetch("/api/base/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
