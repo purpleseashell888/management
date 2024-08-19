@@ -1,6 +1,9 @@
 export default async function createCaptcha() {
   try {
-    const response = await fetch("http://api.jsonlee.cn/base/captcha", {
+    // console.debug(process.env.NODE_ENV, "????")
+
+    const baseURL = process.env.NODE_ENV === "development" ? "/api" : "https://api.jsonlee.cn";
+    const response = await fetch(baseURL + "/base/captcha", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set the appropriate content type
