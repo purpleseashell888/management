@@ -17,20 +17,13 @@ export const authOptions = {
         // that is false/null if the credentials are invalid.
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
 
-        // const client = await connectToDatabase();
-
-        // const usersCollection = client.db().collection("users");
-
-        // Add logic here to look up the user from the credentials supplied
-        // const user = await usersCollection.findOne({
-        //   name: credentials.name,
-        // });
-        console.log(credentials, ">>>")
+        console.log(credentials, ">>>");
         try {
           const baseURL =
             process.env.NODE_ENV === "development"
               ? "http://localhost:3000/proxy"
               : "http://api.jsonlee.cn";
+
           const response = await fetch(baseURL + "/base/login", {
             method: "POST",
             headers: {
@@ -44,47 +37,32 @@ export const authOptions = {
             }),
           });
 
-          // console.log(response);
-
-          // const contentType = response.headers.get("content-type");
-          // console.log(contentType);
-
-          // const responseText = await response.text();
-          // console.log("Response Text:", responseText);
-
-          // Parse the response
           /**
            * 应该先判断ok再进行json处理
            */
-          const data = await response.json();
-          console.log(data);
-          // Check if the login was successful
-          if (response.ok && data.success) {
-            const user = data.user;
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+
+          // Parse the response
+          const result = await response.json();
+          console.log(result);
+
+          // Add logic here to look up the user from the credentials supplied
+          if (result.data) {
+            const user = result.data.user;
 
             // Return user object which contains name and roles
             return { name: user.userName, roles: user.userName };
           } else {
             // If login fails, throw an error
-            throw new Error(data.message || "Login failed");
+            throw new Error(result.message || "Login failed");
           }
         } catch (error) {
           console.log(error);
           // Handle errors (e.g., network errors, incorrect credentials)
           throw new Error(error.message || "An error occurred during login");
         }
-
-        // if (!user) {
-        //   client.close();
-        //   throw new Error("No user found!");
-        // }
-
-        // if (credentials.password !== user.password) {
-        //   throw new Error("Could not log you in!");
-        // }
-        // client.close();
-
-        // return { name: user.name, roles: user.roles };
       },
     }),
   ],

@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
-import { signIn } from 'next-auth/react';
-import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import createCaptcha from '@/lib/captcha';
+import { signIn } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import createCaptcha from "@/lib/captcha";
 
 export default function Login() {
   const router = useRouter();
@@ -11,19 +11,14 @@ export default function Login() {
   const passwordInputRef = useRef();
   const captchaInputRef = useRef();
 
-  const [captcha, setCaptcha] = useState('');
-  const [captchaId, setCaptchaId] = useState('');
-
-  // console.log(captcha);
-
-  // console.log(captcha.dataUrl);
+  const [captcha, setCaptcha] = useState("");
+  const [captchaId, setCaptchaId] = useState("");
 
   const handleRefresh = async () => {
     try {
       const { dataUrl, captchaId } = await createCaptcha();
       setCaptcha(dataUrl);
-      setCaptchaId(captchaId)
-      // console.debug(res);
+      setCaptchaId(captchaId);
     } catch (error) {
       console.log(error);
     }
@@ -42,8 +37,6 @@ export default function Login() {
     const enteredCaptcha = captchaInputRef.current.value;
     // const { captchaId } = await createCaptcha();
 
-    // console.log(enteredName, enteredPassword, enteredCaptcha, captchaId);
-
     const result = await signIn("credentials", {
       redirect: false,
       captcha: enteredCaptcha,
@@ -52,7 +45,7 @@ export default function Login() {
       name: enteredName,
     });
     if (result.ok) {
-      router.push('/');
+      router.push("/");
     } else {
       console.log(result);
     }
@@ -90,17 +83,27 @@ export default function Login() {
               ref={passwordInputRef}
             />
           </div>
-          <div>
-            <Image src={captcha} width={200} height={30} alt="captcha" />
-            <button onClick={handleRefresh}>刷新</button>
+          <div className="flex mt-5">
+            <Image
+              src={captcha}
+              style={{ cursor: "pointer" }}
+              width={150}
+              height={30}
+              alt="captcha"
+              onClick={handleRefresh}
+            />
+            {/* <button onClick={handleRefresh}>刷新</button> */}
             <input
-              className="w-full border-2 border-gray-100 rounded-xl p-4 mt-3 bg-transparent"
+              className="mx-3 w-[150px] border-2 border-gray-100 rounded-xl p-4 mt-3 bg-transparent"
               required
               ref={captchaInputRef}
             />
           </div>
           <div className="mt-8 flex flex-col">
-            <button className="py-3 rounded-xl bg-violet-500 text-white text-lg font-bold" type="submit">
+            <button
+              className="py-3 rounded-xl bg-violet-500 text-white text-lg font-bold"
+              type="submit"
+            >
               登录
             </button>
           </div>
