@@ -13,6 +13,8 @@ export default function Login() {
 
   const { captcha, setCaptcha } = useState(createCaptcha());
 
+  // console.log(createCaptcha());
+
   console.log(captcha);
 
   // console.log(captcha.dataUrl);
