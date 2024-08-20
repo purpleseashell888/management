@@ -12,18 +12,23 @@ const routes = [
   //   { key: "/welcome", label: "首页", roles: ["admin", "user"] },
   {
     key: "/sysmanage",
-    label: "系统管理",
+    label: "超级管理员",
     roles: ["admin"],
     children: [
+      { key: "/sysmanage/menu", label: "菜单管理", roles: ["admin"] },
       {
         key: "/sysmanage/roles",
         label: "角色管理",
         roles: ["admin"],
       },
-      { key: "/sysmanage/menu", label: "菜单管理", roles: ["admin"] },
       {
         key: "/sysmanage/apimanage",
         label: "api管理",
+        roles: ["admin"],
+      },
+      {
+        key: "/sysmanage/usermanage",
+        label: "用户管理",
         roles: ["admin"],
       },
     ],
