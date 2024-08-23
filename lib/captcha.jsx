@@ -1,6 +1,6 @@
 export default async function createCaptcha() {
   try {
-    // console.debug(process.env.NODE_ENV, "????")
+    console.debug(process.env.NODE_ENV, "????");
 
     const baseURL =
       process.env.NODE_ENV === "development"

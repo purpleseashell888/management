@@ -17,7 +17,7 @@ export const authOptions = {
         // that is false/null if the credentials are invalid.
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
 
-        console.log(credentials, ">>>");
+        // console.log(credentials, ">>>");
         try {
           const baseURL =
             process.env.NODE_ENV === "development"

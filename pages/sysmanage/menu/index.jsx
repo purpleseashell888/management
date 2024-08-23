@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Table } from "antd";
-
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 const data = [
   {
     key: "1",
@@ -45,6 +45,11 @@ const data = [
 ];
 
 const columns = [
+  {
+    title: "",
+    key: "expand",
+    width: 50,
+  },
   {
     title: "ID",
     width: 100,
@@ -97,65 +102,54 @@ const columns = [
     title: "文件路径",
     dataIndex: "address",
     key: "7",
-    width: 150,
+    width: 200,
   },
   {
     title: "操作",
-    width: 100,
+    width: 280,
     key: "operation",
     fixed: "right",
-    render: () => <a>action</a>,
+    render: () => (
+      <div className="flex ">
+        <div className="flex p-2">
+          <div className="px-1">
+            <PlusOutlined />
+          </div>
+          添加子菜单
+        </div>
+        <div className="flex p-2">
+          <div className="px-1">
+            <EditOutlined />
+          </div>
+          编辑
+        </div>
+        <div className="flex p-2">
+          <div className="px-1">
+            <DeleteOutlined />
+          </div>
+          删除
+        </div>
+      </div>
+    ),
   },
 ];
 
 export default function Menu() {
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-
-  const toggleRow = (record) => {
-    const key = record.key; // Extract the unique key of the row
-    if (expandedRowKeys.includes(key)) {
-      // If expanded, remove the key to collapse the row
-      setExpandedRowKeys(expandedRowKeys.filter((k) => k !== key));
-    } else {
-      // If not expanded, add the key to expand the row
-      setExpandedRowKeys([...expandedRowKeys, key]);
-    }
-  };
-  console.log(expandedRowKeys);
-
-  const expandIconAsTable = ({ record }) => {
-    if (!record.children) {
-      return <span style={{ paddingLeft: "16px" }} />; // No icon, just an empty space for alignment
-    }
-
-    return (
-      <span
-        onClick={() => toggleRow(record)}
-        style={{ cursor: "pointer", userSelect: "none" }}
-      >
-        {expandedRowKeys.includes(record.key) ? "-" : "+"}
-      </span>
-    );
-  };
   return (
     <Table
       columns={columns}
       dataSource={data}
       expandable={{
-        expandedRowRender: (record) => (
-          <Table
-            columns={columns}
-            dataSource={record.children}
-            pagination={false}
-            rowKey={(row) => row.key}
-            // showHeader={false}
-          />
-        ),
-        expandIcon: expandIconAsTable,
-        expandedRowKeys: expandedRowKeys, // Pass the expandedRowKeys state
-        onExpand: (expanded, record) => toggleRow(record), // Handle row expansion
+        indentSize: 20,
+        // defaultExpandAllRows: false, // Optionally control initial expanded state
+        expandIconColumnIndex: 0, // Ensure the expand icon is in the first column
+        childrenColumnName: "children", // Explicitly define the children key
       }}
       rowKey={(record) => record.key}
+      scroll={{
+        x: 1500,
+      }}
+      size="small"
     />
   );
 }
