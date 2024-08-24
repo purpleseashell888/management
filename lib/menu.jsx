@@ -6,6 +6,7 @@ export default async function createMenu() {
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000/proxy"
         : "https://api.jsonlee.cn";
+
     const response = await fetch(baseURL + "/menu/getMenuList", {
       method: "POST",
       headers: {
@@ -28,7 +29,7 @@ export default async function createMenu() {
       throw new Error("Invalid Menu data");
     }
 
-    return result; // Use picPath as the CAPTCHA image data URL
+    return result;
   } catch (error) {
     console.error("Error fetching Menu:", error);
     return null;

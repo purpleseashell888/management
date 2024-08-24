@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Table } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import createMenu from "@/lib/menu";
 const data = [
   {
     key: "1",
@@ -135,6 +136,19 @@ const columns = [
 ];
 
 export default function Menu() {
+  const handleMenu = async () => {
+    try {
+      const result = await createMenu();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    handleMenu();
+  }, []);
+
   return (
     <Table
       columns={columns}
