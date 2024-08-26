@@ -46,14 +46,20 @@ export const authOptions = {
 
           // Parse the response
           const result = await response.json();
-          console.log(result);
+          // console.log(result);
+          const token = result.data.token;
+          console.log(token);
 
           // Add logic here to look up the user from the credentials supplied
           if (result.data) {
             const user = result.data.user;
 
             // Return user object which contains name and roles
-            return { name: user.userName, roles: user.userName };
+            return {
+              name: user.userName,
+              roles: user.userName,
+              accessToken: token, // Include the token here};
+            };
           } else {
             // If login fails, throw an error
             throw new Error(result.message || "Login failed");
@@ -72,16 +78,18 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, user }) {
-      // Add roles to the token
+      // Add roles and access token to the token object
       if (user) {
         token.roles = user.roles;
+        token.accessToken = user.accessToken; // Store the token in the JWT
       }
       return token;
     },
 
     async session({ session, token }) {
-      // Add roles to the session
+      // Add roles and access token to the session
       session.user.roles = token.roles;
+      session.user.accessToken = token.accessToken; // Store the token in the session
       return session;
     },
   },

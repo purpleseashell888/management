@@ -1,6 +1,14 @@
+import { getSession } from "next-auth/react";
+
 export default async function createMenu() {
   try {
     // console.debug(process.env.NODE_ENV, "????");
+    const session = await getSession(); // Get the current session
+    console.log(session.user.accessToken);
+
+    if (!session || !session.user?.accessToken) {
+      throw new Error("User is not authenticated or token is missing");
+    }
 
     const baseURL =
       process.env.NODE_ENV === "development"
@@ -11,6 +19,7 @@ export default async function createMenu() {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set the appropriate content type
+        Authorization: `Bearer ${session.user.accessToken}`, // Include the token here
       },
       body: JSON.stringify({
         page: 1,
