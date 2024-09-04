@@ -48,7 +48,7 @@ export const authOptions = {
           const result = await response.json();
           // console.log(result);
           const token = result.data.token;
-          console.log(token);
+          // console.log(token);
 
           // Add logic here to look up the user from the credentials supplied
           if (result.data) {

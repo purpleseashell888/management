@@ -1,10 +1,11 @@
 import { getSession } from "next-auth/react";
 
-export default async function createMenu() {
+export default async function fetchMenu() {
   try {
     // console.debug(process.env.NODE_ENV, "????");
+
     const session = await getSession(); // Get the current session
-    console.log(session.user.accessToken);
+    // console.log(session.user.accessToken);
 
     if (!session || !session.user?.accessToken) {
       throw new Error("User is not authenticated or token is missing");
@@ -19,24 +20,25 @@ export default async function createMenu() {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set the appropriate content type
-        Authorization: `Bearer ${session.user.accessToken}`, // Include the token here
+        "x-token": session.user.accessToken, // Include the token here
       },
       body: JSON.stringify({
         page: 1,
         pageSize: 20,
       }), // You can pass an empty body if the API doesn't require any specific parameters
     });
-    console.log(response);
+    // console.log(response);
 
     if (!response.ok) {
       throw new Error("Failed to fetch Menu data");
     }
 
     const result = await response.json();
+    // console.log(result);
 
-    if (!result.data) {
-      throw new Error("Invalid Menu data");
-    }
+    // if (result.code != 0) {
+    //   throw new Error("Invalid Menu data");
+    // }
 
     return result;
   } catch (error) {

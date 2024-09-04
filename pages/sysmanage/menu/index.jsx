@@ -1,49 +1,69 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import { Table } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import createMenu from "@/lib/menu";
-const data = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    children: [
-      {
-        key: "1.1",
-        name: "Jim Green",
-        age: 42,
-        address: "London No. 1 Lake Park",
-      },
-      {
-        key: "1.2",
-        name: "Joe Black",
-        age: 32,
-        address: "Sidney No. 1 Lake Park",
-      },
-    ],
-  },
-  {
-    key: "2",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    children: [
-      {
-        key: "2.1",
-        name: "Jim Green",
-        age: 42,
-        address: "London No. 1 Lake Park",
-      },
-      {
-        key: "2.2",
-        name: "Joe Black",
-        age: 32,
-        address: "Sidney No. 1 Lake Park",
-      },
-    ],
-  },
-];
+import {
+  PlusOutlined,
+  NodeIndexOutlined,
+  SunOutlined,
+  ProfileOutlined,
+  TruckOutlined,
+  BookOutlined,
+  MenuUnfoldOutlined,
+  GiftOutlined,
+  UpSquareOutlined,
+  VerticalAlignTopOutlined,
+  CopyOutlined,
+  ShopOutlined,
+  ReadOutlined,
+  FolderOutlined,
+  ToolOutlined,
+  RocketOutlined,
+  PieChartOutlined,
+  MailOutlined,
+  TabletOutlined,
+  ScheduleOutlined,
+  IdcardOutlined,
+  LaptopOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  HomeOutlined,
+  DashboardOutlined,
+  UserOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
+
+import { useMenu } from "@/lib/menu/useMenu";
+import NewDrawer from "@/component/drawer/NewDrawer";
+import EditDrawer from "@/component/drawer/EditDrawer";
+import DeleteDrawer from "@/component/drawer/DeleteDrawer";
+
+// Define a mapping between icon names and Ant Design icon components
+const iconMapping = {
+  "customer-gva": <HomeOutlined />,
+  odometer: <DashboardOutlined />,
+  user: <UserOutlined />,
+  avatar: <IdcardOutlined />,
+  tickets: <ScheduleOutlined />,
+  platform: <LaptopOutlined />,
+  coordinate: <TeamOutlined />,
+  notebook: <TabletOutlined />,
+  "pie-chart": <PieChartOutlined />,
+  message: <MailOutlined />,
+  tools: <ToolOutlined />,
+  "magic-stick": <CopyOutlined />,
+  folder: <FolderOutlined />,
+  cpu: <RocketOutlined />,
+  operation: <TruckOutlined />,
+  reading: <ReadOutlined />,
+  cherry: <NodeIndexOutlined />,
+  management: <MenuUnfoldOutlined />,
+  shop: <ShopOutlined />,
+  box: <GiftOutlined />,
+  files: <BookOutlined />,
+  upload: <VerticalAlignTopOutlined />,
+  "upload-filled": <UpSquareOutlined />,
+  cloudy: <SunOutlined />,
+  "info-filled": <ProfileOutlined />,
+};
 
 const columns = [
   {
@@ -60,50 +80,56 @@ const columns = [
   {
     title: "展示名称",
     width: 100,
-    dataIndex: "name",
-    key: "name",
+    dataIndex: "title",
+    key: "title",
   },
   {
     title: "图标",
-    width: 100,
+    width: 200,
     dataIndex: "icon",
     key: "icon",
+    render: (iconName) => (
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {iconMapping[iconName]} {/* Render the icon */}
+        <span>{iconName}</span> {/* Display the icon name */}
+      </div>
+    ), // Render the icon based on the mapping
   },
   {
     title: "路由Name",
     width: 150,
-    dataIndex: "route-name",
-    key: "route-name",
+    dataIndex: "route",
+    key: "route",
   },
   {
     title: "路由Path",
-    dataIndex: "route-path",
-    key: "route-path",
+    dataIndex: "path",
+    key: "path",
     width: 150,
   },
   {
     title: "是否隐藏",
-    width: 150,
-    dataIndex: "hide",
-    key: "hide",
+    width: 100,
+    dataIndex: "hidden",
+    key: "hidden",
   },
   {
     title: "父节点",
     width: 100,
-    dataIndex: "node",
-    key: "node",
+    dataIndex: "parentId",
+    key: "parentId",
   },
   {
     title: "排序",
-    width: 150,
-    dataIndex: "order",
-    key: "order",
+    width: 100,
+    dataIndex: "sort",
+    key: "sort",
   },
   {
     title: "文件路径",
-    dataIndex: "address",
-    key: "7",
-    width: 200,
+    dataIndex: "component",
+    key: "component",
+    width: 350,
   },
   {
     title: "操作",
@@ -116,50 +142,86 @@ const columns = [
           <div className="px-1">
             <PlusOutlined />
           </div>
-          添加子菜单
+          <NewDrawer>添加子菜单</NewDrawer>
         </div>
         <div className="flex p-2">
           <div className="px-1">
             <EditOutlined />
           </div>
-          编辑
+          <EditDrawer>编辑</EditDrawer>
         </div>
         <div className="flex p-2">
           <div className="px-1">
             <DeleteOutlined />
           </div>
-          删除
+          <DeleteDrawer>删除</DeleteDrawer>
         </div>
       </div>
     ),
   },
 ];
 
-export default function Menu() {
-  const handleMenu = async () => {
-    try {
-      const result = await createMenu();
-      console.log(result);
-    } catch (error) {
-      console.log(error);
+const handleData = (data) => {
+  const processItem = (item) => {
+    // Create the cell object for the current item
+    let cell = {
+      key: item.ID,
+      title: item.meta.title,
+      icon: item.meta.icon,
+      route: item.path,
+      path: item.path,
+      parentId: item.parentId,
+      sort: item.sort,
+      component: item.component,
+    };
+
+    // Recursively process children if they exist and are not null
+    if (item.children && item.children.length > 0) {
+      cell.children = item.children.map(processItem);
     }
+
+    if (item.hidden === false) {
+      cell.hidden = "显示";
+    } else {
+      cell.hidden = "隐藏";
+    }
+
+    return cell;
   };
 
-  useEffect(() => {
-    handleMenu();
-  }, []);
+  // Process the root data array
+  const processedData = (data ?? []).map(processItem);
+  // console.log(processedData);
+  return processedData;
+};
+
+export default function Menu() {
+  const { menu, error } = useMenu();
+  // console.log(menu);
+
+  let data2 = useMemo(() => {
+    return handleData(menu);
+  }, [menu]);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!menu) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Table
       columns={columns}
-      dataSource={data}
+      dataSource={data2}
       expandable={{
         indentSize: 20,
         // defaultExpandAllRows: false, // Optionally control initial expanded state
         expandIconColumnIndex: 0, // Ensure the expand icon is in the first column
         childrenColumnName: "children", // Explicitly define the children key
       }}
-      rowKey={(record) => record.key}
+      rowKey={data2.key}
       scroll={{
         x: 1500,
       }}
