@@ -4,6 +4,7 @@ import React from "react";
 import Dashboard from "@/component/dashboard";
 
 import "@/styles/globals.css";
+import "jsonlee-ui-react/dist/styles/style.css";
 
 export default function App({
   Component,

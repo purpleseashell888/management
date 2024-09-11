@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Button, Col, Drawer, Form, Input, Row, Select, Space } from "antd";
+import NewDrawer from "./NewDrawer";
+import NewButton from "./NewButton";
+import NewParams from "./NewParams";
 const { Option } = Select;
 
 export default function EditDrawer({ children }) {
@@ -238,21 +241,9 @@ export default function EditDrawer({ children }) {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={30}>
-            <Col span={24}>
-              <Form.Item
-                name="description"
-                label="Description"
-                rules={[
-                  {
-                    required: true,
-                    message: "please enter url description",
-                  },
-                ]}
-              ></Form.Item>
-            </Col>
-          </Row>
         </Form>
+        <NewParams />
+        <NewButton />
       </Drawer>
     </>
   );

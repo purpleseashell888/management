@@ -1,9 +1,23 @@
 import React, { useState } from "react";
-import { Button, Col, Drawer, Form, Input, Row, Select, Space } from "antd";
+import {
+  Button,
+  Col,
+  Drawer,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Checkbox,
+} from "antd";
+import NewParams from "./NewParams";
+import NewButton from "./NewButton";
+
 const { Option } = Select;
 
-export default function NewDrawer({ children }) {
+export default function NewDrawer({ children, title }) {
   const [open, setOpen] = useState(false);
+  const [isDisabled, setDisabled] = useState(true); // State for route name input disabled
 
   const showDrawer = () => {
     setOpen(true);
@@ -11,6 +25,14 @@ export default function NewDrawer({ children }) {
 
   const onClose = () => {
     setOpen(false);
+  };
+
+  //If the checkbox is checked (true), !e.target.checked evaluates to false,
+  // and setDisabled(false) is called, enabling the input field.
+  // If the checkbox is unchecked (false), !e.target.checked evaluates to true,
+  // and setDisabled(true) is called, disabling the input field.
+  const handleCheckboxChange = (e) => {
+    setDisabled(!e.target.checked);
   };
 
   return (
@@ -42,7 +64,11 @@ export default function NewDrawer({ children }) {
             <Col span={16}>
               <Form.Item
                 name="component"
-                label="文件路径"
+                label={
+                  <span>
+                    <span style={{ color: "red" }}>*</span> 文件路径
+                  </span>
+                }
                 rules={[
                   {
                     required: true,
@@ -56,7 +82,11 @@ export default function NewDrawer({ children }) {
             <Col span={8}>
               <Form.Item
                 name="title"
-                label="展示名称"
+                label={
+                  <span>
+                    <span style={{ color: "red" }}>*</span> 展示名称
+                  </span>
+                }
                 rules={[
                   {
                     required: true,
@@ -76,7 +106,11 @@ export default function NewDrawer({ children }) {
             <Col span={8}>
               <Form.Item
                 name="route"
-                label="路由Name"
+                label={
+                  <span>
+                    <span style={{ color: "red" }}>*</span> 路由Name
+                  </span>
+                }
                 rules={[
                   {
                     required: true,
@@ -90,7 +124,14 @@ export default function NewDrawer({ children }) {
             <Col span={8}>
               <Form.Item
                 name="path"
-                label="路由Path"
+                label={
+                  <span>
+                    <span style={{ color: "red" }}>*</span> 路由Path
+                    <Checkbox className="mx-3" onChange={handleCheckboxChange}>
+                      添加参数
+                    </Checkbox>
+                  </span>
+                }
                 rules={[
                   {
                     required: true,
@@ -98,7 +139,10 @@ export default function NewDrawer({ children }) {
                   },
                 ]}
               >
-                <Input placeholder="建议只在后方拼接参数" />
+                <Input
+                  placeholder="建议只在后方拼接参数"
+                  disabled={isDisabled}
+                />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -131,7 +175,7 @@ export default function NewDrawer({ children }) {
                   },
                 ]}
               >
-                <Select placeholder="官方网站">
+                <Select placeholder={title} disabled>
                   <Option value="xiao">Xiaoxiao Fu</Option>
                   <Option value="mao">Maomao Zhou</Option>
                 </Select>
@@ -238,21 +282,9 @@ export default function NewDrawer({ children }) {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={30}>
-            <Col span={24}>
-              <Form.Item
-                name="description"
-                label="Description"
-                rules={[
-                  {
-                    required: true,
-                    message: "please enter url description",
-                  },
-                ]}
-              ></Form.Item>
-            </Col>
-          </Row>
         </Form>
+        <NewParams />
+        <NewButton />
       </Drawer>
     </>
   );

@@ -136,13 +136,14 @@ const columns = [
     width: 280,
     key: "operation",
     fixed: "right",
-    render: () => (
+    render: (text, record) => (
       <div className="flex ">
         <div className="flex p-2">
           <div className="px-1">
             <PlusOutlined />
           </div>
-          <NewDrawer>添加子菜单</NewDrawer>
+          {/* Pass the title value to the NewDrawer component */}
+          <NewDrawer title={record.title}>添加子菜单</NewDrawer>
         </div>
         <div className="flex p-2">
           <div className="px-1">
