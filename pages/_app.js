@@ -1,4 +1,5 @@
 import { SessionProvider } from "next-auth/react";
+import { MenuProvider } from "@/context/MenuContext";
 
 import React from "react";
 import Dashboard from "@/component/dashboard";
@@ -12,9 +13,11 @@ export default function App({
 }) {
   return (
     <SessionProvider session={session}>
-      <Dashboard>
-        <Component {...pageProps} />
-      </Dashboard>
+      <MenuProvider>
+        <Dashboard>
+          <Component {...pageProps} />
+        </Dashboard>
+      </MenuProvider>
     </SessionProvider>
   );
 }

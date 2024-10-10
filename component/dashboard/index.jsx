@@ -1,49 +1,45 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState, useContext } from "react";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
+// import fetchMenu from "@/lib/menu/fetchMenu";
+import { MenuContext } from "@/context/MenuContext";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const routes = [
-  { key: "/", label: "首页", roles: ["admin", "user"] },
-  //   { key: "/welcome", label: "首页", roles: ["admin", "user"] },
-  {
-    key: "/sysmanage",
-    label: "超级管理员",
-    roles: ["admin"],
-    children: [
-      { key: "/sysmanage/menu", label: "菜单管理", roles: ["admin"] },
-      {
-        key: "/sysmanage/roles",
-        label: "角色管理",
-        roles: ["admin"],
-      },
-      {
-        key: "/sysmanage/apimanage",
-        label: "api管理",
-        roles: ["admin"],
-      },
-      {
-        key: "/sysmanage/usermanage",
-        label: "用户管理",
-        roles: ["admin"],
-      },
-    ],
-  },
-  {
-    key: "/systools",
-    label: "系统工具",
-    roles: ["admin"],
-    children: [
-      { key: "/systools/mode", label: "模版配置", roles: ["admin"] },
-      { key: "/systools/table", label: "表格模版", roles: ["admin"] },
-    ],
-  },
-  { key: "/about", label: "关于项目", roles: ["admin", "user"] },
-];
+const handleRoutes = (data) => {
+  // Create the cell object for the current item
+  const processItem = (item) => {
+    // Skip item if hidden is true
+    if (item.hidden === true) {
+      return null; // Exclude this item
+    }
+
+    let cell = {
+      key: item.path,
+      label: item.meta.title,
+    };
+
+    // Recursively process children if they exist and are not null
+    if (item.children && item.children.length > 0) {
+      const processedChildren = item.children
+        .map(processItem)
+        .filter((child) => child !== null);
+      if (processedChildren.length > 0) {
+        cell.children = processedChildren;
+      }
+    }
+
+    return cell;
+  };
+
+  // Process the root data array, filtering out any null items
+  const processedData = (data ?? [])
+    .map(processItem)
+    .filter((item) => item !== null);
+
+  return processedData;
+};
 
 const flatten = (arr = []) => {
   return arr.flatMap((item) => {
@@ -53,8 +49,6 @@ const flatten = (arr = []) => {
     return [item];
   });
 };
-
-const flattenRoutes = flatten(routes);
 
 const findParent = (path, arr, res = []) => {
   // Start of the outer loop, which iterates over each item in the array
@@ -86,19 +80,31 @@ const findParent = (path, arr, res = []) => {
 };
 
 export default function Dashboard({ children }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [route, setRoute] = useState([]); // New state for the route data
+  const [flattenRoutes, setFlattenRoutes] = useState([]); // New state for the route data
   const router = useRouter();
   const { pathname } = router;
-  const { data: session } = useSession();
+  // const defaultSelectedKeys = [pathname];
 
-  const defaultSelectedKeys = [pathname];
+  const { menuData } = useContext(MenuContext);
 
-  const defaultOpenKeys = findParent(pathname, routes).map((item) => item.key);
+  console.log(menuData);
+
+  useEffect(() => {
+    const processedRoutes = handleRoutes(menuData); // Process the menu data
+    setRoute(processedRoutes); // Update the state with processed routes
+
+    const flattedData = flatten(processedRoutes);
+    setFlattenRoutes(flattedData);
+  }, [menuData]);
+
+  console.log(route);
+  console.log(flattenRoutes);
+
+  const defaultOpenKeys = findParent(pathname, route).map((item) => item.key);
+
+  const [selectedKeys, setSelectedKeys] = useState([pathname]);
   const [openKeys, setOpenKeys] = useState(defaultOpenKeys);
-
-  if (pathname === "/welcome") {
-    router.push("/");
-  }
 
   const onClick = (e) => {
     router.push(e.key);
@@ -120,29 +126,36 @@ export default function Dashboard({ children }) {
     setOpenKeys([_openKeys.pop()]);
   };
 
-  const filteredItems = routes.map((item) => {
-    let newItem = { ...item }; // Create a copy of the item to avoid mutating the original
+  // Update openKeys and selectedKeys whenever pathname or route changes
+  useEffect(() => {
+    const parentKeys = findParent(pathname, route).map((item) => item.key);
+    setOpenKeys(parentKeys);
+    setSelectedKeys([pathname]);
+  }, [pathname, route]);
 
-    if (newItem.children) {
-      // Filter children based on user's roles
-      newItem.children = newItem.children.filter(
-        (subItem) =>
-          session?.user.roles && subItem.roles.includes(session?.user.roles)
-      );
+  // const filteredItems = routes.map((item) => {
+  //   let newItem = { ...item }; // Create a copy of the item to avoid mutating the original
 
-      // Set children to undefined if no children remain after filtering
-      if (newItem.children.length === 0) {
-        newItem.children = undefined;
-      }
-    }
+  //   if (newItem.children) {
+  //     // Filter children based on user's roles
+  //     newItem.children = newItem.children.filter(
+  //       (subItem) =>
+  //         session?.user.roles && subItem.roles.includes(session?.user.roles)
+  //     );
 
-    // Return the item if the user has access based on their roles
-    if (session?.user.roles && newItem.roles.includes(session?.user.roles)) {
-      return newItem;
-    }
+  //     // Set children to undefined if no children remain after filtering
+  //     if (newItem.children.length === 0) {
+  //       newItem.children = undefined;
+  //     }
+  //   }
 
-    return null; // Filter out items that don't match
-  });
+  //   // Return the item if the user has access based on their roles
+  //   if (session?.user.roles && newItem.roles.includes(session?.user.roles)) {
+  //     return newItem;
+  //   }
+
+  //   return null; // Filter out items that don't match
+  // });
 
   return (
     <div className="overflow-hidden">
@@ -156,9 +169,9 @@ export default function Dashboard({ children }) {
           }}
         >
           <Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
+            // collapsible
+            // collapsed={collapsed}
+            // onCollapse={(value) => setCollapsed(value)}
             theme="light"
           >
             <div className="flex items-center justify-center h-[60px] ">
@@ -167,11 +180,10 @@ export default function Dashboard({ children }) {
             <div className="demo-logo-vertical" />
             <Menu
               theme="light"
-              defaultSelectedKeys={defaultSelectedKeys}
-              // defaultOpenKeys={defaultOpenKeys}
+              selectedKeys={selectedKeys}
               openKeys={openKeys}
               mode="inline"
-              items={filteredItems}
+              items={route}
               onClick={onClick}
               onOpenChange={handleOpenChange}
             />
