@@ -37,6 +37,7 @@ import EditDrawer from "@/component/drawer/EditDrawer";
 import DeleteDrawer from "@/component/drawer/DeleteDrawer";
 import updateMenuItem from "@/lib/menu/updateMenuItem";
 import Login from "@/pages/login";
+import deleteMenu from "@/lib/menu/deleteMenu";
 
 // Define a mapping between icon names and Ant Design icon components
 const iconMapping = {
@@ -211,7 +212,9 @@ export default function Menu() {
             <div className="px-1">
               <DeleteOutlined />
             </div>
-            <DeleteDrawer>删除</DeleteDrawer>
+            <DeleteDrawer record={record} onDelete={handleDelete}>
+              删除
+            </DeleteDrawer>
           </div>
         </div>
       ),
@@ -228,6 +231,18 @@ export default function Menu() {
     } catch (err) {
       console.error(err);
       message.error("Failed to update menu item.");
+    }
+  };
+
+  const handleDelete = async (itemId) => {
+    try {
+      // Make an API call to update the menu item
+      await deleteMenu(itemId); // You'll need to implement this API call
+      message.success("Menu item deleted successfully!");
+      refetch(); // Re-fetch the menu data
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to delete menu item.");
     }
   };
 

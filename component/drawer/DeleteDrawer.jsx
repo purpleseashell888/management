@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Modal } from "antd";
 
-export default function DeleteDrawer({ children }) {
+export default function DeleteDrawer({ children, record, onDelete }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
+  console.log(record);
 
-  const handleOk = () => {
+  const handleOk = async () => {
+    await onDelete(record.key);
     setIsModalOpen(false);
   };
 

@@ -10,7 +10,6 @@ import {
   Select,
   Space,
   Checkbox,
-  Cascader,
 } from "antd";
 import NewButton from "./NewButton";
 import NewParams from "./NewParams";
@@ -231,14 +230,10 @@ export default function EditDrawer({ children, record, onUpdate }) {
                   },
                 ]}
               >
-                {/* <Select
+                <ParentTree
                   value={parentId}
                   onChange={(value) => setParentId(value)}
-                >
-                  <Option value="xiao">Xiaoxiao Fu</Option>
-                  <Option value="mao">Maomao Zhou</Option>
-                </Select> */}
-                <ParentTree name={title} />
+                />
               </Form.Item>
             </Col>
             <Col span={8}>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 // import fetchMenu from "@/lib/menu/fetchMenu";
 import { MenuContext } from "@/context/MenuContext";
+import { IconPark } from "jsonlee-ui-react";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -18,6 +19,8 @@ const handleRoutes = (data) => {
     let cell = {
       key: item.path,
       label: item.meta.title,
+      icon: (item) => <IconPark name={item.meta.icon} />,
+      // icon: item.meta.icon,
     };
 
     // Recursively process children if they exist and are not null
@@ -81,14 +84,13 @@ const findParent = (path, arr, res = []) => {
 
 export default function Dashboard({ children }) {
   const [route, setRoute] = useState([]); // New state for the route data
+
   const [flattenRoutes, setFlattenRoutes] = useState([]); // New state for the route data
   const router = useRouter();
   const { pathname } = router;
   // const defaultSelectedKeys = [pathname];
 
   const { menuData } = useContext(MenuContext);
-
-  console.log(menuData);
 
   useEffect(() => {
     const processedRoutes = handleRoutes(menuData); // Process the menu data
@@ -97,9 +99,6 @@ export default function Dashboard({ children }) {
     const flattedData = flatten(processedRoutes);
     setFlattenRoutes(flattedData);
   }, [menuData]);
-
-  console.log(route);
-  console.log(flattenRoutes);
 
   const defaultOpenKeys = findParent(pathname, route).map((item) => item.key);
 
