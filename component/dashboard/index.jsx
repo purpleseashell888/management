@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -19,7 +19,7 @@ const handleRoutes = (data) => {
     let cell = {
       key: item.path,
       label: item.meta.title,
-      icon: (item) => <IconPark name={item.meta.icon} />,
+      icon: <IconPark name={item.meta.icon} />,
       // icon: item.meta.icon,
     };
 
@@ -83,22 +83,25 @@ const findParent = (path, arr, res = []) => {
 };
 
 export default function Dashboard({ children }) {
-  const [route, setRoute] = useState([]); // New state for the route data
+  // const [route, setRoute] = useState([]); // New state for the route data
+  // const [flattenRoutes, setFlattenRoutes] = useState([]); // New state for the route data
 
-  const [flattenRoutes, setFlattenRoutes] = useState([]); // New state for the route data
   const router = useRouter();
   const { pathname } = router;
   // const defaultSelectedKeys = [pathname];
 
   const { menuData } = useContext(MenuContext);
 
-  useEffect(() => {
-    const processedRoutes = handleRoutes(menuData); // Process the menu data
-    setRoute(processedRoutes); // Update the state with processed routes
+  const route = useMemo(() => handleRoutes(menuData), [menuData]);
+  const flattenRoutes = useMemo(() => flatten(route), [route]);
 
-    const flattedData = flatten(processedRoutes);
-    setFlattenRoutes(flattedData);
-  }, [menuData]);
+  // useEffect(() => {
+  //   const processedRoutes = handleRoutes(menuData); // Process the menu data
+  //   setRoute(processedRoutes); // Update the state with processed routes
+
+  //   const flattedData = flatten(processedRoutes);
+  //   setFlattenRoutes(flattedData);
+  // }, [menuData]);
 
   const defaultOpenKeys = findParent(pathname, route).map((item) => item.key);
 
@@ -131,30 +134,6 @@ export default function Dashboard({ children }) {
     setOpenKeys(parentKeys);
     setSelectedKeys([pathname]);
   }, [pathname, route]);
-
-  // const filteredItems = routes.map((item) => {
-  //   let newItem = { ...item }; // Create a copy of the item to avoid mutating the original
-
-  //   if (newItem.children) {
-  //     // Filter children based on user's roles
-  //     newItem.children = newItem.children.filter(
-  //       (subItem) =>
-  //         session?.user.roles && subItem.roles.includes(session?.user.roles)
-  //     );
-
-  //     // Set children to undefined if no children remain after filtering
-  //     if (newItem.children.length === 0) {
-  //       newItem.children = undefined;
-  //     }
-  //   }
-
-  //   // Return the item if the user has access based on their roles
-  //   if (session?.user.roles && newItem.roles.includes(session?.user.roles)) {
-  //     return newItem;
-  //   }
-
-  //   return null; // Filter out items that don't match
-  // });
 
   return (
     <div className="overflow-hidden">

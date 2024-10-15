@@ -15,6 +15,7 @@ import NewButton from "./NewButton";
 import NewParams from "./NewParams";
 import ParentTree from "./ParentTree";
 const { Option } = Select;
+import { IconPark } from "jsonlee-ui-react";
 
 export default function EditDrawer({ children, record, onUpdate }) {
   const [open, setOpen] = useState(false);
@@ -81,6 +82,13 @@ export default function EditDrawer({ children, record, onUpdate }) {
     setDisabled(!e.target.checked);
   };
 
+  const iconRef = useRef(null);
+
+  const handleClick = () => {
+    if (iconRef.current) {
+      iconRef.current.load(); // 以编程方式触发图标加载
+    }
+  };
   return (
     <>
       <a type="primary" onClick={showDrawer}>
@@ -247,10 +255,14 @@ export default function EditDrawer({ children, record, onUpdate }) {
                   },
                 ]}
               >
-                <Select value={icon} onChange={(value) => setIcon(value)}>
+                {/* <Select value={icon} onChange={(value) => setIcon(value)}>
                   <Option value="xiao">Xiaoxiao Fu</Option>
                   <Option value="mao">Maomao Zhou</Option>
-                </Select>
+                </Select> */}
+                <div>
+                  <button onClick={handleClick}>加载图标</button>
+                  <IconPark ref={iconRef} name="home" theme="outline" />
+                </div>
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -273,7 +285,7 @@ export default function EditDrawer({ children, record, onUpdate }) {
             </Col>
           </Row>
           <Row gutter={30}>
-            <Col span={8}>
+            {/* <Col span={8}>
               <Form.Item
                 name="menu"
                 label="高亮菜单"
@@ -286,8 +298,8 @@ export default function EditDrawer({ children, record, onUpdate }) {
               >
                 <Input value={menu} onChange={(e) => setMenu(e.target.value)} />
               </Form.Item>
-            </Col>
-            <Col span={8}>
+            </Col> */}
+            {/* <Col span={8}>
               <Form.Item
                 name="alive"
                 label="keepAlive"
@@ -303,7 +315,7 @@ export default function EditDrawer({ children, record, onUpdate }) {
                   <Option value="true">是</Option>
                 </Select>
               </Form.Item>
-            </Col>
+            </Col> */}
             <Col span={8}>
               <Form.Item
                 name="closeTab"
@@ -325,7 +337,7 @@ export default function EditDrawer({ children, record, onUpdate }) {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={30}>
+          {/* <Row gutter={30}>
             <Col span={8}>
               <Form.Item
                 name="page"
@@ -343,7 +355,7 @@ export default function EditDrawer({ children, record, onUpdate }) {
                 </Select>
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
         <NewParams />
         <NewButton />

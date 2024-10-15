@@ -7,7 +7,7 @@ export default function DeleteDrawer({ children, record, onDelete }) {
   const showModal = () => {
     setIsModalOpen(true);
   };
-  console.log(record);
+  // console.log(record);
 
   const handleOk = async () => {
     await onDelete(record.key);

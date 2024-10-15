@@ -1,36 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Table, message } from "antd";
-import {
-  PlusOutlined,
-  NodeIndexOutlined,
-  SunOutlined,
-  ProfileOutlined,
-  TruckOutlined,
-  BookOutlined,
-  MenuUnfoldOutlined,
-  GiftOutlined,
-  UpSquareOutlined,
-  VerticalAlignTopOutlined,
-  CopyOutlined,
-  ShopOutlined,
-  ReadOutlined,
-  FolderOutlined,
-  ToolOutlined,
-  RocketOutlined,
-  PieChartOutlined,
-  MailOutlined,
-  TabletOutlined,
-  ScheduleOutlined,
-  IdcardOutlined,
-  LaptopOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  HomeOutlined,
-  DashboardOutlined,
-  UserOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
-
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useMenu } from "@/lib/menu/useMenu";
 import NewDrawer from "@/component/drawer/NewDrawer";
 import EditDrawer from "@/component/drawer/EditDrawer";
@@ -38,35 +8,7 @@ import DeleteDrawer from "@/component/drawer/DeleteDrawer";
 import updateMenuItem from "@/lib/menu/updateMenuItem";
 import Login from "@/pages/login";
 import deleteMenu from "@/lib/menu/deleteMenu";
-
-// Define a mapping between icon names and Ant Design icon components
-const iconMapping = {
-  "customer-gva": <HomeOutlined />,
-  odometer: <DashboardOutlined />,
-  user: <UserOutlined />,
-  avatar: <IdcardOutlined />,
-  tickets: <ScheduleOutlined />,
-  platform: <LaptopOutlined />,
-  coordinate: <TeamOutlined />,
-  notebook: <TabletOutlined />,
-  "pie-chart": <PieChartOutlined />,
-  message: <MailOutlined />,
-  tools: <ToolOutlined />,
-  "magic-stick": <CopyOutlined />,
-  folder: <FolderOutlined />,
-  cpu: <RocketOutlined />,
-  operation: <TruckOutlined />,
-  reading: <ReadOutlined />,
-  cherry: <NodeIndexOutlined />,
-  management: <MenuUnfoldOutlined />,
-  shop: <ShopOutlined />,
-  box: <GiftOutlined />,
-  files: <BookOutlined />,
-  upload: <VerticalAlignTopOutlined />,
-  "upload-filled": <UpSquareOutlined />,
-  cloudy: <SunOutlined />,
-  "info-filled": <ProfileOutlined />,
-};
+import { IconPark } from "jsonlee-ui-react";
 
 const handleData = (data) => {
   const processItem = (item) => {
@@ -145,7 +87,7 @@ export default function Menu() {
       key: "icon",
       render: (iconName) => (
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          {iconMapping[iconName]} {/* Render the icon */}
+          <IconPark name={iconName} />
           <span>{iconName}</span> {/* Display the icon name */}
         </div>
       ), // Render the icon based on the mapping
@@ -246,7 +188,7 @@ export default function Menu() {
     }
   };
 
-  const data2 = useMemo(() => {
+  const data = useMemo(() => {
     return handleData(menu);
   }, [menu]);
 
@@ -261,7 +203,7 @@ export default function Menu() {
   return (
     <Table
       columns={columns}
-      dataSource={data2}
+      dataSource={data}
       expandable={{
         indentSize: 20,
         // defaultExpandAllRows: false, // Optionally control initial expanded state
