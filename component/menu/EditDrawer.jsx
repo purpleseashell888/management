@@ -15,7 +15,7 @@ import NewButton from "./NewButton";
 import NewParams from "./NewParams";
 import ParentTree from "./ParentTree";
 const { Option } = Select;
-import { IconPark } from "jsonlee-ui-react";
+import { SelectIconPark, IconPark } from "jsonlee-ui-react";
 
 export default function EditDrawer({ children, record, onUpdate }) {
   const [open, setOpen] = useState(false);
@@ -29,12 +29,19 @@ export default function EditDrawer({ children, record, onUpdate }) {
   const [route, setRoute] = useState(record.route || "");
   const [hidden, setHidden] = useState(record.hidden || "");
   const [parentId, setParentId] = useState(record.parentId || "");
-  const [icon, setIcon] = useState(record.icon || "");
+  // const [icon, setIcon] = useState(record.icon || "");
   const [sort, setSort] = useState(record.sort || "");
   const [menu, setMenu] = useState(record.menu || "");
   const [page, setPage] = useState(record.page || "");
   const [alive, setAlive] = useState(record.alive || "");
   const [closeTab, setCloseTab] = useState(record.closeTab || "");
+
+  const iconSelectorRef = useRef(null);
+  const [selectedIcon, setSelectedIcon] = useState(record.icon);
+
+  const handleIconChange = (icon) => {
+    setSelectedIcon(icon);
+  };
 
   const showDrawer = () => {
     setOpen(true);
@@ -55,7 +62,7 @@ export default function EditDrawer({ children, record, onUpdate }) {
       route: String(route),
       hidden: hidden === "true",
       parentId: parentId,
-      icon: icon,
+      icon: selectedIcon,
       sort: sort,
       menu: menu,
       alive: alive === "true",
@@ -82,13 +89,6 @@ export default function EditDrawer({ children, record, onUpdate }) {
     setDisabled(!e.target.checked);
   };
 
-  const iconRef = useRef(null);
-
-  const handleClick = () => {
-    if (iconRef.current) {
-      iconRef.current.load(); // 以编程方式触发图标加载
-    }
-  };
   return (
     <>
       <a type="primary" onClick={showDrawer}>
@@ -259,9 +259,21 @@ export default function EditDrawer({ children, record, onUpdate }) {
                   <Option value="xiao">Xiaoxiao Fu</Option>
                   <Option value="mao">Maomao Zhou</Option>
                 </Select> */}
-                <div>
-                  <button onClick={handleClick}>加载图标</button>
-                  <IconPark ref={iconRef} name="home" theme="outline" />
+                <div className="flex content-center">
+                  <IconPark
+                    name={selectedIcon}
+                    className="content-center p-2"
+                  />
+                  <button onClick={() => iconSelectorRef.current.open()}>
+                    选择图标
+                  </button>
+                  <SelectIconPark
+                    ref={iconSelectorRef}
+                    value={selectedIcon}
+                    onChange={handleIconChange}
+                    title="选择一个图标"
+                    placeholder="搜索图标"
+                  />
                 </div>
               </Form.Item>
             </Col>
@@ -285,37 +297,6 @@ export default function EditDrawer({ children, record, onUpdate }) {
             </Col>
           </Row>
           <Row gutter={30}>
-            {/* <Col span={8}>
-              <Form.Item
-                name="menu"
-                label="高亮菜单"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select an owner",
-                  },
-                ]}
-              >
-                <Input value={menu} onChange={(e) => setMenu(e.target.value)} />
-              </Form.Item>
-            </Col> */}
-            {/* <Col span={8}>
-              <Form.Item
-                name="alive"
-                label="keepAlive"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select an owner",
-                  },
-                ]}
-              >
-                <Select value={alive} onChange={(value) => setAlive(value)}>
-                  <Option value="false">否</Option>
-                  <Option value="true">是</Option>
-                </Select>
-              </Form.Item>
-            </Col> */}
             <Col span={8}>
               <Form.Item
                 name="closeTab"
@@ -337,25 +318,6 @@ export default function EditDrawer({ children, record, onUpdate }) {
               </Form.Item>
             </Col>
           </Row>
-          {/* <Row gutter={30}>
-            <Col span={8}>
-              <Form.Item
-                name="page"
-                label="是否为基础页面"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select an owner",
-                  },
-                ]}
-              >
-                <Select value={page} onChange={(value) => setPage(value)}>
-                  <Option value="false">否</Option>
-                  <Option value="true">是</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row> */}
         </Form>
         <NewParams />
         <NewButton />

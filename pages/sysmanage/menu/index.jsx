@@ -2,9 +2,9 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Table, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useMenu } from "@/lib/menu/useMenu";
-import NewDrawer from "@/component/drawer/NewDrawer";
-import EditDrawer from "@/component/drawer/EditDrawer";
-import DeleteDrawer from "@/component/drawer/DeleteDrawer";
+import NewDrawer from "@/component/menu/NewDrawer";
+import EditDrawer from "@/component/menu/EditDrawer";
+import DeleteDrawer from "@/component/menu/DeleteDrawer";
 import updateMenuItem from "@/lib/menu/updateMenuItem";
 import Login from "@/pages/login";
 import deleteMenu from "@/lib/menu/deleteMenu";
@@ -165,27 +165,14 @@ export default function Menu() {
 
   // Function to handle updating a menu item
   const handleUpdate = async (updatedItem) => {
-    try {
-      // Make an API call to update the menu item
-      await updateMenuItem(updatedItem); // You'll need to implement this API call
-      message.success("Menu item updated successfully!");
-      refetch(); // Re-fetch the menu data
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to update menu item.");
-    }
+    await updateMenuItem(updatedItem); // You'll need to implement this API call
+    refetch(); // Re-fetch the menu data
   };
 
   const handleDelete = async (itemId) => {
-    try {
-      // Make an API call to update the menu item
-      await deleteMenu(itemId); // You'll need to implement this API call
-      message.success("Menu item deleted successfully!");
-      refetch(); // Re-fetch the menu data
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to delete menu item.");
-    }
+    // Make an API call to update the menu item
+    await deleteMenu(itemId); // You'll need to implement this API call
+    refetch(); // Re-fetch the menu data
   };
 
   const data = useMemo(() => {
