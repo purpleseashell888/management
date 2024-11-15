@@ -10,25 +10,26 @@ export default function CopyRoles({ children, record, onCopy, existingKeys }) {
   //   const [oldAuthorityId, setOldAuthorityId] = useState(record.key || "");
   const [authorityName, setAuthorityName] = useState(record.name || "");
 
+  const [error, setError] = useState(""); // State for handling errors
+
   const showDrawer = () => {
     setOpen(true);
+    setError(""); // Reset error when opening the drawer
   };
 
   const onClose = () => {
     setOpen(false);
+    setError(""); // Reset error when opening the drawer
   };
 
   const handleSave = async () => {
     if (existingKeys.includes(authorityId)) {
-      <Alert message="拷贝失败，存在相同id" type="error" />;
-
-      //   onClose();
-
-      return; // Prevent further execution if the ID already exists
+      setError("拷贝失败，存在相同id");
+      return; // Prevent the drawer from closing if there's an error
     }
 
     const copyRecord = {
-      key: Number(authorityId),
+      //   key: Number(authorityId),
       oldAuthorityId: Number(record.key),
       parentId: Number(parentId),
       authorityId: Number(authorityId),
@@ -78,7 +79,12 @@ export default function CopyRoles({ children, record, onCopy, existingKeys }) {
           </Space>
         }
       >
+        {/* Show Alert when there's an error */}
+        {error && <Alert message={error} type="error" showIcon />}
         <Form
+          style={{
+            margin: "10px 0",
+          }}
           layout="vertical"
           initialValues={{
             parentId: record.parentId || "",
@@ -100,8 +106,8 @@ export default function CopyRoles({ children, record, onCopy, existingKeys }) {
                 ]}
               >
                 <ParentRoles
-                  value={parentId}
-                  onChange={(value) => setParentId(value)}
+                // value={parentId}
+                // onChange={(value) => setParentId(value)}
                 />
               </Form.Item>
             </Col>
@@ -119,8 +125,8 @@ export default function CopyRoles({ children, record, onCopy, existingKeys }) {
                 ]}
               >
                 <Input
-                  value={authorityId}
-                  onChange={(e) => setAuthorityId(e.target.value)}
+                // value={authorityId}
+                // onChange={(e) => setAuthorityId(e.target.value)}
                 />
               </Form.Item>
             </Col>
@@ -138,8 +144,8 @@ export default function CopyRoles({ children, record, onCopy, existingKeys }) {
                 ]}
               >
                 <Input
-                  value={authorityName}
-                  onChange={(e) => setAuthorityName(e.target.value)}
+                // value={authorityName}
+                // onChange={(e) => setAuthorityName(e.target.value)}
                 />
               </Form.Item>
             </Col>

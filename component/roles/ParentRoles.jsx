@@ -38,14 +38,15 @@ const handleTree = (data) => {
   return [root];
 };
 
-export default function ParentRoles({ onChange, value }) {
+export default function ParentRoles({ onChange, value, disabled }) {
   const { authority } = useAuthority();
-  console.log(authority);
+  // console.log(authority);
 
   const treeData = useMemo(() => handleTree(authority), [authority]);
 
   return (
     <TreeSelect
+      disabled={disabled}
       showSearch
       style={{
         width: "100%",

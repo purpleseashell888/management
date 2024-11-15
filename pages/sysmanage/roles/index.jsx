@@ -7,12 +7,16 @@ import {
   CopyOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { useAuthority, deleteAuthority } from "@/lib/authority/useAuthority";
+import { useAuthority } from "@/lib/authority/useAuthority";
 import DeleteRoles from "@/component/roles/DeleteRoles";
 import EditRoles from "@/component/roles/EditRoles";
 import updateAuthority from "@/lib/authority/updateAuthority";
 import CopyRoles from "@/component/roles/CopyRoles";
 import copyAuthority from "@/lib/authority/copyAuthority";
+import deleteAuthority from "@/lib/authority/deleteAuthority";
+import NewRoles from "@/component/roles/NewRoles";
+import createAuthority from "@/lib/authority/createAuthority";
+import SetAuthority from "@/component/roles/SetAuthority";
 
 const handleData = (data) => {
   const processItem = (item) => {
@@ -39,7 +43,6 @@ const handleData = (data) => {
 
 export default function Roles() {
   const { authority, error, refetch } = useAuthority();
-  console.log(authority);
 
   const columns = [
     {
@@ -70,13 +73,15 @@ export default function Roles() {
             <div className="px-1">
               <SettingOutlined />
             </div>
-            设置权限
+            <SetAuthority record={record}>设置权限</SetAuthority>
           </div>
           <div className="flex p-2">
             <div className="px-1">
               <PlusOutlined />
             </div>
-            新增子角色
+            <NewRoles record={record} onCreate={handleCreate}>
+              新增子角色
+            </NewRoles>
           </div>
           <div className="flex p-2">
             <div className="px-1">
@@ -110,6 +115,12 @@ export default function Roles() {
       ),
     },
   ];
+
+  const handleCreate = async (authorityItem) => {
+    await createAuthority(authorityItem);
+    refetch();
+  };
+
   const handleCopy = async (authorityItem) => {
     await copyAuthority(authorityItem); // You'll need to implement this API call
     refetch(); // Re-fetch the menu data

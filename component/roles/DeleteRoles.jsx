@@ -3,18 +3,17 @@ import { Modal } from "antd";
 
 export default function DeleteRoles({ children, record, onDelete }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(record);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = async () => {
-    const copyRecord = {
-      authorityId: Number(record.key),
-    };
+    // const copyRecord = {
+    //   authorityId: Number(record.key),
+    // };
 
-    await onDelete(copyRecord);
+    await onDelete(Number(record.key));
 
     setIsModalOpen(false);
   };

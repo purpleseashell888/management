@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react";
 
-export default async function deleteAuthority(authorityId) {
+export default async function updateCasbin(authorityId, casbinInfos) {
   try {
     const session = await getSession(); // Get the current session
 
@@ -13,7 +13,7 @@ export default async function deleteAuthority(authorityId) {
         ? "http://localhost:3000/proxy"
         : "https://api.jsonlee.cn";
 
-    const response = await fetch(baseURL + "/authority/deleteAuthority", {
+    const response = await fetch(baseURL + "/casbin/updateCasbin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set the appropriate content type
@@ -21,19 +21,20 @@ export default async function deleteAuthority(authorityId) {
       },
       body: JSON.stringify({
         authorityId: authorityId,
-      }), // You can pass an empty body if the API doesn't require any specific parameters
+        casbinInfos: casbinInfos,
+      }),
     });
+    // console.log(response);
 
     if (!response.ok) {
-      throw new Error("Failed to delete roles");
+      throw new Error("Failed to update Casbin");
     }
 
     const result = await response.json();
-    console.log(result);
 
     return result;
   } catch (error) {
-    console.error("Error deleting roles:", error);
+    console.error("Error update Casbin:", error);
     return null;
   }
 }
