@@ -24,7 +24,7 @@ export default function SetAuthority({ children, record }) {
     {
       key: "1",
       label: "角色菜单",
-      children: <MenuTree />,
+      children: <MenuTree authorityId={authorityId} />,
     },
     {
       key: "2",

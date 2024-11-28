@@ -1,33 +1,35 @@
 import { useRouter } from "next/router";
 import { useEffect, useState, useCallback } from "react";
-import getAllApis from "./getAllApis";
+import getMenuAuthority from "./getMenuAuthority";
 
-export function useApis() {
+export function useMenuAuthority(authorityId) {
   const router = useRouter();
-  const [apis, setApis] = useState(null);
+  const [menuAuthority, setMenuAuthority] = useState(null);
   const [error, setError] = useState(null);
   //   const [loading, setLoading] = useState(false);
 
   // Define the fetch function using useCallback to prevent unnecessary re-creations
   const fetchData = useCallback(async () => {
     // setLoading(true);
+    // const fetchData = await getPolicyPathByAuthorityId(authorityId);
+    // console.log(fetchData);
 
     try {
-      const result = await getAllApis();
+      const result = await getMenuAuthority(authorityId);
 
       if (result.code === 0) {
-        setApis(result.data.apis);
+        setMenuAuthority(result.data.menus);
         setError(null); // Clear any previous errors
       } else if (result.code === 7) {
         router.replace("/login"); // Redirect if fetching fails due to auth
       } else {
-        setError(result.message || "Failed to fetch apis data.");
+        setError(result.message || "Failed to fetch menu by id.");
       }
     } catch (err) {
-      console.error("Error fetching apis data:", err);
-      setError("An error occurred while fetching the authority data.");
+      console.error("Error fetching menu by id:", err);
+      setError("An error occurred while fetching the menu by id.");
     }
-  }, [router]);
+  }, [router, authorityId]);
 
   // Fetch menu data on mount
   useEffect(() => {
@@ -35,9 +37,9 @@ export function useApis() {
   }, [fetchData]);
 
   // Define the mutate function to allow manual re-fetching
-  const refetchAPIs = useCallback(() => {
+  const refetch = useCallback(() => {
     fetchData();
   }, [fetchData]);
 
-  return { apis, error, refetchAPIs };
+  return { menuAuthority, error, refetch };
 }

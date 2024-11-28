@@ -9,10 +9,6 @@ export default function DeleteRoles({ children, record, onDelete }) {
   };
 
   const handleOk = async () => {
-    // const copyRecord = {
-    //   authorityId: Number(record.key),
-    // };
-
     await onDelete(Number(record.key));
 
     setIsModalOpen(false);

@@ -29,7 +29,7 @@ export function usePolicyPathById(authorityId) {
       console.error("Error fetching path by id:", err);
       setError("An error occurred while fetching the path by id.");
     }
-  }, [router]);
+  }, [router, authorityId]);
 
   // Fetch menu data on mount
   useEffect(() => {

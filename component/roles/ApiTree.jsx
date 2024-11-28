@@ -3,6 +3,7 @@ import { Tree } from "antd";
 import { useApis } from "@/lib/authority/useApis";
 import { usePolicyPathById } from "@/lib/authority/usePolicyPathById";
 import { useUpdateCasbin } from "@/lib/authority/useUpdateCasbin";
+import updateCasbin from "@/lib/authority/updateCasbin";
 
 const handleData = (data) => {
   // Step 0: Check if data is null, undefined, or not an array
@@ -47,7 +48,7 @@ const handleData = (data) => {
 
 export default function ApiTree(authorityId) {
   const [checkedKeys, setCheckedKeys] = useState([]);
-  const [casbinInfos, setCasbinInfos] = useState([]);
+  // const [casbinInfos, setCasbinInfos] = useState([]);
 
   const { apis } = useApis();
   console.log(apis);
@@ -60,7 +61,13 @@ export default function ApiTree(authorityId) {
 
   // 最开始没有打钩，为了给有权限的path打钩
   // 当resultPath里path的值等于apis里path的值的时候，把api里ID赋值给CheckedKeys
+
   const matchCheckedKeys = useMemo(() => {
+    // Step 0: If resultPath or apis is not valid, return an empty array
+    if (!resultPath || !apis) {
+      return []; // Return an empty array if data is null, undefined, or not an array
+    }
+
     // Step 1: Check if resultPath is valid
     if (resultPath && apis) {
       // Step 2: Filter the apis based on matching paths in resultPath
@@ -70,8 +77,6 @@ export default function ApiTree(authorityId) {
         )
         .map((api) => api.ID); // Extract the IDs of the matched apis
     }
-    // Step 3: If resultPath is not valid, return an empty array
-    return [];
   }, [resultPath, apis]); // Dependencies: recalculate when resultPath or apis change
 
   useMemo(() => {
@@ -81,18 +86,37 @@ export default function ApiTree(authorityId) {
   const onCheck = (checkedKeysValue) => {
     console.log("onCheck", checkedKeysValue);
     setCheckedKeys(checkedKeysValue); // Update the checked keys in state
-
-    // Loop through checkedKeysValue and find the corresponding API objects
-    const casbinInfos = apis
-      .filter((api) => checkedKeysValue.includes(api.ID)) // Find APIs where the ID matches
-      .map((api) => ({ path: api.path, method: api.method })); // Extract the path and method from each matching API
-
-    console.log("Checked APIs:", casbinInfos); // Log the checked APIs
-    setCasbinInfos(casbinInfos);
   };
-  console.log(casbinInfos);
 
-  useUpdateCasbin(authorityId.authorityId, casbinInfos);
+  // Loop through checkedKeysValue and find the corresponding API objects
+  // 为useUpdateCasbin做准备
+
+  const casbinInfos = useMemo(() => {
+    if (!apis) {
+      return []; // Return an empty array if data is null, undefined, or not an array
+    }
+    if (apis) {
+      return (
+        apis
+          .filter((api) => checkedKeys.includes(api.ID)) // Find APIs where the ID matches
+          // Extract the path and method from each matching API
+          .map((api) => ({ path: api.path, method: api.method }))
+      );
+    }
+  }, [apis, checkedKeys]);
+
+  console.log("Checked APIs:", casbinInfos); // Log the checked APIs
+
+  //是不是复杂了，不用写这么多，直接updateCasbin(authorityId, casbinInfos);
+  const handleUpdateCasbin = async (authorityId, casbinInfos) => {
+    await updateCasbin(authorityId, casbinInfos);
+    //这个refetch是usePolicyPathById里的
+    refetch();
+  };
+
+  // useUpdateCasbin(authorityId.authorityId, casbinInfos);
+  //这个refetch是usePolicyPathById里的
+  // refetch()
 
   const onSelect = (selectedKeys, info) => {
     console.log("selected", selectedKeys, info);

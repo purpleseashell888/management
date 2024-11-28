@@ -17,7 +17,7 @@ export const authOptions = {
         // that is false/null if the credentials are invalid.
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
 
-        // console.log(credentials, ">>>");
+        console.log(credentials, ">>>");
         try {
           const baseURL =
             process.env.NODE_ENV === "development"
@@ -41,19 +41,18 @@ export const authOptions = {
            * 应该先判断ok再进行json处理
            */
           if (!response.ok) {
-            throw new Error("Failed to fetch data");
+            const error = await response.json(); // 尝试解析错误详情
+            throw new Error(error.message || "Failed to fetch data");
           }
 
           // Parse the response
           const result = await response.json();
           // console.log(result);
-          const token = result.data.token;
+          const { user, token } = result.data || {};
           // console.log(token);
 
           // Add logic here to look up the user from the credentials supplied
-          if (result.data) {
-            const user = result.data.user;
-
+          if (user && token) {
             // Return user object which contains name and roles
             return {
               name: user.userName,
@@ -65,7 +64,7 @@ export const authOptions = {
             throw new Error(result.message || "Login failed");
           }
         } catch (error) {
-          console.log(error);
+          console.error("Login error:", error);
           // Handle errors (e.g., network errors, incorrect credentials)
           throw new Error(error.message || "An error occurred during login");
         }

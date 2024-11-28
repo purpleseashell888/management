@@ -9,9 +9,13 @@ export function MenuProvider({ children }) {
 
   // Function to fetch the menu data
   const loadMenuData = async () => {
-    const data = await fetchMenu();
-    const menu = data.data.list;
-    setMenuData(menu);
+    try {
+      const data = await fetchMenu();
+      const menu = data.data.list;
+      setMenuData(menu);
+    } catch (error) {
+      console.error(error, "getMenu");
+    }
   };
 
   // Re-fetch data when the updateTrigger changes
